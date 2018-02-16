@@ -1,6 +1,6 @@
-use specs::{VecStorage, ReadStorage};
+use specs::VecStorage;
 
-pub struct DeltaTime(pub f64);
+pub struct DeltaTime(pub f32);
 
 #[derive(Component, Debug)]
 #[component(VecStorage)]

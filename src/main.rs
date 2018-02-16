@@ -17,7 +17,7 @@ fn main() {
     let mut world = World::new();
     world.register::<Position>();
 
-    world.add_resource(DeltaTime(16.6f64));
+    world.add_resource(DeltaTime(0f32));
 
     world.create_entity()
         .with(Position{x:0f32,y:0f32})
@@ -59,7 +59,7 @@ fn main() {
         if let Some(u) = event.update_args() {
             {
                 let mut delta = world.write_resource::<DeltaTime>();
-                *delta = DeltaTime(u.dt);
+                *delta = DeltaTime(u.dt as f32);
             }
             dispatcher.dispatch(&mut world.res);
         }
