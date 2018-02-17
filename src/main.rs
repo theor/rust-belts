@@ -2,6 +2,7 @@ extern crate find_folder;
 extern crate piston_window;
 extern crate specs;
 extern crate graphics;
+extern crate rayon;
 // extern crate sprite;
 #[macro_use]
 extern crate specs_derive;
@@ -12,29 +13,42 @@ use specs::{DispatcherBuilder, World, };
 mod components;
 mod render_system;
 mod move_system;
+mod update_pos_system;
 mod resmgr;
 
 use components::*;
+use components::Position;
 
 fn main() {
     let mut world = World::new();
     world.register::<Position>();
-    world.register::<Sprite>();
+    world.register::<Renderer>();
+    world.register::<Belt>();
+    world.register::<Item>();
+    world.register::<GridItem>();
 
     world.add_resource(DeltaTime(0f32));
     world.add_resource(Camera(0f32, 50f32));
 
-for i in 0..10 {
+    for i in 0..10 {
+        world.create_entity()
+            .with(Position{x:i as f32 * 32f32,y:0f32})
+            .with(GridItem{ix:i, iy:0})
+            .with(Renderer::sprite("transport-belt.png", (0u8,0u8)))
+            .with(Belt{})
+            .build();
+    }
+
     world.create_entity()
-        .with(Position{x:i as f32 * 32f32,y:0f32})
-        .with(Sprite{sheet:"transport-belt.png", rect: (0u8,0u8)})
-        .with(Belt)
+        .with(Position{x:0f32,y:0f32})
+        .with(Renderer::shape((16u8,16u8)))
+        .with(GridItem{ix:0, iy:0})
+        .with(Item{})
         .build();
-    
-}
 
     let mut dispatcher = DispatcherBuilder::new()
-        // .add(move_system::System, "move", &[])
+        .add(move_system::System::new(), "move", &[])
+        .add(update_pos_system::System, "update_pos_system", &["move"])
     .build();
 
     let mut window: PistonWindow = WindowSettings::new("Hello Piston!", [640, 480])

@@ -11,15 +11,51 @@ pub struct Position {
 }
 
 #[derive(Component, Debug)]
-#[component(DenseVecStorage)]
-pub struct Belt {}
+#[component(VecStorage)]
+pub struct GridItem {
+    pub ix: u32,
+    pub iy: u32,
+}
 
 #[derive(Component, Debug)]
 #[component(DenseVecStorage)]
-pub struct Item {}
+pub struct Belt {
+}
+
+#[derive(Component, Debug)]
+#[component(DenseVecStorage)]
+pub struct Item {
+}
 
 #[derive(Component, Debug)]
 #[component(VecStorage)]
+pub enum Renderer {
+    SpriteSheet(Sprite),
+    Shape(Shape),
+}
+
+impl Renderer {
+    pub fn sprite(sheet: &'static str, rect: (u8,u8)) -> Self {
+        Renderer::SpriteSheet(Sprite {
+            sheet: sheet,
+            rect: rect,
+        })
+    }
+    pub fn shape(rect: (u8,u8)) -> Self {
+        Renderer::Shape(Shape {
+            rect: rect,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct Shape {
+    pub rect: (u8,u8),
+    // pub x: f32,
+    // pub y: f32
+}
+
+#[derive(Debug)]
 pub struct Sprite {
     pub sheet: &'static str,
     pub rect: (u8,u8),
