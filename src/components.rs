@@ -1,4 +1,4 @@
-use specs::VecStorage;
+use specs::{DenseVecStorage,VecStorage};
 
 pub struct DeltaTime(pub f32);
 pub struct Camera(pub f32, pub f32);
@@ -9,6 +9,14 @@ pub struct Position {
     pub x: f32,
     pub y: f32
 }
+
+#[derive(Component, Debug)]
+#[component(DenseVecStorage)]
+pub struct Belt {}
+
+#[derive(Component, Debug)]
+#[component(DenseVecStorage)]
+pub struct Item {}
 
 #[derive(Component, Debug)]
 #[component(VecStorage)]

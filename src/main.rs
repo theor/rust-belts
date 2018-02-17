@@ -14,7 +14,7 @@ mod render_system;
 mod move_system;
 mod resmgr;
 
-use components::{DeltaTime, Camera, Position, Sprite};
+use components::*;
 
 fn main() {
     let mut world = World::new();
@@ -28,12 +28,13 @@ for i in 0..10 {
     world.create_entity()
         .with(Position{x:i as f32 * 32f32,y:0f32})
         .with(Sprite{sheet:"transport-belt.png", rect: (0u8,0u8)})
+        .with(Belt)
         .build();
     
 }
 
     let mut dispatcher = DispatcherBuilder::new()
-        .add(move_system::System, "move", &[])
+        // .add(move_system::System, "move", &[])
     .build();
 
     let mut window: PistonWindow = WindowSettings::new("Hello Piston!", [640, 480])
