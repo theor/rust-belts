@@ -1,6 +1,8 @@
 extern crate find_folder;
 extern crate piston_window;
 extern crate specs;
+extern crate graphics;
+// extern crate sprite;
 #[macro_use]
 extern crate specs_derive;
 
@@ -10,22 +12,25 @@ use specs::{DispatcherBuilder, World, };
 mod components;
 mod render_system;
 mod move_system;
+mod resmgr;
 
-use components::{DeltaTime, Position};
+use components::{DeltaTime, Camera, Position, Sprite};
 
 fn main() {
     let mut world = World::new();
     world.register::<Position>();
+    world.register::<Sprite>();
 
     world.add_resource(DeltaTime(0f32));
+    world.add_resource(Camera(0f32, 50f32));
 
+for i in 0..10 {
     world.create_entity()
-        .with(Position{x:0f32,y:0f32})
+        .with(Position{x:i as f32 * 32f32,y:0f32})
+        .with(Sprite{sheet:"transport-belt.png", rect: (0u8,0u8)})
         .build();
-
-    world.create_entity()
-        .with(Position{x:500f32,y:200f32})
-        .build();
+    
+}
 
     let mut dispatcher = DispatcherBuilder::new()
         .add(move_system::System, "move", &[])
@@ -36,14 +41,17 @@ fn main() {
         .build()
         .unwrap();
 
-    let assets = find_folder::Search::ParentsThenKids(3, 3)
-        .for_folder("assets")
-        .unwrap();
-    println!("{:?}", assets);
+    let mut mgr = resmgr::ResMgr::new();
+    {
+        mgr.load(&mut window.factory, "transport-belt.png", 16, (40,40))
+    }
+    world.add_resource(mgr);
+
     // let ref font = assets.join("FiraSans-Regular.ttf");
     // let factory = window.factory.clone();
     // let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
-
+    // let image   = Image::new().rect(graphics::rectangle::square(0.0, 0.0, 200.0));
+    
     while let Some(event) = window.next() {
 
         if let Some(_r) = event.render_args() {

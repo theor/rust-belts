@@ -4,7 +4,11 @@ version = "0.1.0"
 authors = ["theor <theo.richart@gmail.com>"]
 
 [dependencies]
-piston_window = "0.70.0"
+piston_window = "0.76.0"
 specs = "*"
 specs-derive = "*"
 find_folder = "*"
+# image = "*"
+piston2d-sprite = "*"
+piston2d-graphics = "*"
+# gfx = "*"
