@@ -46,6 +46,20 @@ fn main() {
         .with(Item{})
         .build();
 
+    // world.create_entity()
+    //     .with(Position{x:0f32,y:0f32})
+    //     .with(Renderer::shape((16u8,16u8)))
+    //     .with(GridItem::new(2, 1))
+    //     .with(Item{})
+    //     .build();
+
+    // world.create_entity()
+    //     .with(Position{x:0f32,y:0f32})
+    //     .with(Renderer::shape((16u8,16u8)))
+    //     .with(GridItem::new(0, 2))
+    //     .with(Item{})
+    //     .build();
+
     let mut dispatcher = DispatcherBuilder::new()
         .add(move_system::System::new(), "move", &[])
         .add(update_pos_system::System, "update_pos_system", &["move"])

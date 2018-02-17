@@ -26,16 +26,14 @@ impl<'a> specs::System<'a> for System {
         use rayon::prelude::*;
         use specs::ParJoin;
         self.i += 1;
+        let delta_i = ((1.0/30.0)*255.0) as u16;
         (&mut grid, &item).par_join().for_each(|(grid, item)| {
-            let modi = self.i % 30;
-            if modi == 0 {
+            let ddx:u16 = grid.dx as u16 + delta_i;
+            // println!("grid {:?} ddx {}", grid, ddx);
+            if ddx > 255 {
                 grid.ix += 1;
-                grid.dx = 0;
             }
-            else {
-                grid.dx += ((1.0/30.0)*255.0) as u8;
-                // println!("grid {:?} i {}", grid, self.i);
-            }
+            grid.dx = (ddx % 256) as u8;
 
         //     for (belt_pos, belt) in (&pos, &belt).join() {
         //         // position.x += delta.0 * 50f32;
