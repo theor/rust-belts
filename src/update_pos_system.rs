@@ -16,8 +16,9 @@ impl<'a> specs::System<'a> for System {
         (&grid, &mut pos)
           .par_join()
           .for_each(|(grid, pos)|{
-              pos.x = grid.ix as f32 * 32f32;
-              pos.y = grid.iy as f32 * 32f32;
+              pos.x = (grid.ix as f32 + grid.dx as f32 / 255.0) * 32f32;
+              pos.y = (grid.iy as f32 + grid.dy as f32 / 255.0) * 32f32;
+            //   println!("grid {:?} pos {:?}", grid, pos);
             // position.x += delta.0 * 50f32;
           });
     }

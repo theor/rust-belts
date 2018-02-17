@@ -33,7 +33,7 @@ fn main() {
     for i in 0..10 {
         world.create_entity()
             .with(Position{x:i as f32 * 32f32,y:0f32})
-            .with(GridItem{ix:i, iy:0})
+            .with(GridItem::new(i, 0))
             .with(Renderer::sprite("transport-belt.png", (0u8,0u8)))
             .with(Belt{})
             .build();
@@ -42,7 +42,7 @@ fn main() {
     world.create_entity()
         .with(Position{x:0f32,y:0f32})
         .with(Renderer::shape((16u8,16u8)))
-        .with(GridItem{ix:0, iy:0})
+        .with(GridItem::new(0, 0))
         .with(Item{})
         .build();
 

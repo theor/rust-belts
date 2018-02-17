@@ -15,6 +15,20 @@ pub struct Position {
 pub struct GridItem {
     pub ix: u32,
     pub iy: u32,
+    
+    pub dx: u8,
+    pub dy: u8,
+}
+
+impl GridItem {
+    pub fn new(x: u32, y: u32) -> Self {
+        GridItem {
+            ix: x,
+            iy: y,
+            dx: 0u8,
+            dy: 0u8,
+        }
+    }
 }
 
 #[derive(Component, Debug)]
