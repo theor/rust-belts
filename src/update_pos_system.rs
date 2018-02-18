@@ -1,5 +1,5 @@
 use specs;
-use specs::{Fetch, ReadStorage, WriteStorage};
+use specs::{Fetch, ReadStorage, WriteStorage, Entities};
 
 use components::*;
 // use piston::graphics;
@@ -7,12 +7,21 @@ use components::*;
 pub struct System;
 
 impl<'a> specs::System<'a> for System {
-    type SystemData = (ReadStorage<'a, GridItem>,
+    type SystemData = (WriteStorage<'a, GridItem>,
+                       WriteStorage<'a, GridVelocity>,
                        WriteStorage<'a, Position>);
 
-    fn run(&mut self, (grid, mut pos): Self::SystemData) {
+    fn run(&mut self, (mut grid, mut grid_vel, mut pos): Self::SystemData) {
         use rayon::prelude::*;
         use specs::ParJoin;
+
+        (&mut grid, &mut grid_vel)
+          .par_join()
+          .for_each(|(grid, grid_vel)|{
+              grid.move_delta(grid_vel.dx, grid_vel.dy);
+              grid_vel.dx = 0;
+              grid_vel.dy = 0;
+          });
         (&grid, &mut pos)
           .par_join()
           .for_each(|(grid, pos)|{

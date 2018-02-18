@@ -20,9 +20,10 @@ impl<'a> specs::System<'a> for System {
     type SystemData = (Fetch<'a, DeltaTime>,
                        ReadStorage<'a, Belt>,
                        ReadStorage<'a, Item>,
-                       WriteStorage<'a, GridItem>);
+                       ReadStorage<'a, GridItem>,
+                       WriteStorage<'a, GridVelocity>);
 
-    fn run(&mut self, (delta, belt, item, mut grid): Self::SystemData) {
+    fn run(&mut self, (delta, belt, item, mut grid, mut vel): Self::SystemData) {
         use rayon::prelude::*;
         use specs::ParJoin;
         use std::vec;
@@ -30,24 +31,27 @@ impl<'a> specs::System<'a> for System {
         let delta_i = ((1.0/30.0)*255.0) as u16;
         
         use specs::Join;
-        let mut all_belt_items = vec::Vec::new();
+        // let mut all_belt_items = vec::Vec::new();
         for (belt, belt_grid) in (&belt, &grid).join() {
-            let mut belt_items = vec::Vec::new();
-            for (grid, item) in (&grid, &item).join() {
+            // let mut belt_items = vec::Vec::new();
+            for (grid, item, vel) in (&grid, &item, &mut vel).join() {
+                // println!("  test item {:?}", grid);
                 if grid.ix == belt_grid.ix && grid.iy == belt_grid.iy {
-                    belt_items.push(item);
+                    // belt_items.push(item);
+                    vel.dx = 10;
+                    // println!("    move item {:?}", grid);
                 }
             }
-            all_belt_items.push(((belt_grid.ix, belt_grid.iy), belt_items));
+            // all_belt_items.push(((belt_grid.ix, belt_grid.iy), belt_items));
         }
 
-        for((bx,by),items) in all_belt_items {
-            
-        }
+        // for((bx,by),items) in all_belt_items {
 
-        for (grid, item) in (&mut grid, &item).join() {
+        // }
+
+        // for (grid, item) in (&mut grid, &item).join() {
             
-        }
+        // }
                 // position.x += delta.0 * 50f32;
             // }
         // (&mut grid, &item).par_join().for_each(|(grid, item)| {

@@ -10,6 +10,15 @@ pub struct Position {
     pub y: f32
 }
 
+impl Position {
+    pub fn new() -> Self {
+        Position {
+            x: 0.0,
+            y: 0.0,
+        }
+    }
+}
+
 #[derive(Component, Debug)]
 #[component(VecStorage)]
 pub struct GridItem {
@@ -28,6 +37,35 @@ impl GridItem {
             dx: 0u8,
             dy: 0u8,
         }
+    }
+    pub fn move_delta(&mut self, x: i16, y: i16) {
+        if x >= 0 {
+            let new_dx = self.dx as u32 + x as u32;
+            self.dx = (new_dx % 256) as u8;
+            self.ix += new_dx / 256;
+        } else {
+
+        }
+        if y >= 0 {
+            let new_dy = self.dy as u32 + y as u32;
+            self.dy = (new_dy % 256) as u8;
+            self.iy += new_dy / 256;
+        } else {
+
+        }
+    }
+}
+
+#[derive(Component, Debug)]
+#[component(VecStorage)]
+pub struct GridVelocity {
+    pub dx: i16,
+    pub dy: i16,
+}
+
+impl GridVelocity {
+    pub fn new() -> Self {
+        GridVelocity { dx: 0, dy: 0 }
     }
 }
 
