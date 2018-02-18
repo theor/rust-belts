@@ -15,6 +15,7 @@ mod render_system;
 mod move_system;
 mod update_pos_system;
 mod resmgr;
+// mod quadtree;
 
 use components::*;
 use components::Position;
