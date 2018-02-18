@@ -1,5 +1,5 @@
 use specs::{Fetch, ReadStorage, System as BaseSystem};
-use piston_window::{Event, Image, PistonWindow};
+use piston_window::{Event, PistonWindow};
 use resmgr::ResMgr;
 use components::*;
 

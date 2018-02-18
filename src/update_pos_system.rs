@@ -1,5 +1,5 @@
 use specs;
-use specs::{Fetch, ReadStorage, WriteStorage, Entities};
+use specs::{WriteStorage};
 
 use components::*;
 // use piston::graphics;

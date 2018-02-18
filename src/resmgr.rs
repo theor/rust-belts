@@ -1,8 +1,7 @@
 use std;
 use std::collections::HashMap;
 use find_folder;
-use piston_window::{G2dTexture, GfxFactory, PistonWindow, Texture, TextureSettings, Flip};
-use piston_window;
+use piston_window::{G2dTexture, GfxFactory, Texture, TextureSettings, Flip};
 
 pub struct ResMgr {
     assets_path: std::path::PathBuf,
