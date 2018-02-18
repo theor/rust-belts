@@ -2,6 +2,7 @@ use specs::{DenseVecStorage,VecStorage};
 
 pub struct DeltaTime(pub f32);
 pub struct Camera(pub f32, pub f32);
+pub struct FPS(pub usize);
 
 #[derive(Component, Debug)]
 #[component(VecStorage)]

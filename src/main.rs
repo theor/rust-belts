@@ -2,6 +2,7 @@
 
 extern crate find_folder;
 extern crate flame;
+extern crate fps_counter;
 extern crate graphics;
 extern crate piston_window;
 extern crate rayon;
@@ -22,9 +23,10 @@ mod factory;
 // mod quadtree;
 
 
+use fps_counter::FPSCounter;
 use piston_window::*;
 use specs::{DispatcherBuilder, World, };
-use components::DeltaTime;
+use components::{FPS, DeltaTime};
 
 fn main() {
     let mut world = World::new();
@@ -56,21 +58,25 @@ fn main() {
     // let ref font = assets.join("FiraSans-Regular.ttf");
     // let factory = window.factory.clone();
     // let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
+    world.add_resource(FPS(0));
     // let image   = Image::new().rect(graphics::rectangle::square(0.0, 0.0, 200.0));
     
+    let mut counter = FPSCounter::new();
+
     while let Some(event) = window.next() {
 
         if let Some(_r) = event.render_args() {
             use specs::RunNow;
 
+             {
+                let mut delta = world.write_resource::<FPS>();
+                *delta = FPS(counter.tick());
+            }
             // let _guard = flame::start_guard("render");
             let mut render = render_system::System(&mut window, &event);
             render.run_now(&mut world.res);
-        }
 
-        //         let transform = context.transform.trans(10.0, 100.0);
-        //         text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32)
-        //             .draw("Hello world!", &mut glyphs, &context.draw_state, transform, graphics);
+        }
 
         if let Some(u) = event.update_args() {
             {
