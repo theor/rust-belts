@@ -32,6 +32,14 @@ fn main() {
     let mut world = World::new();
     factory::init(&mut world);
     
+    //  for j in 0..100 {
+    //         for i in 0..100 {
+    //             factory::belt(&mut world, i, j);
+    //         }
+    //         for i in 0..10 {
+    //             factory::item(&mut world, i, j);
+    //         }
+    //     }
     for i in 0..10 {
         factory::belt(&mut world, i, 0);
     }
@@ -53,11 +61,10 @@ fn main() {
     {
         mgr.load(&mut window.factory, "transport-belt.png", 16, (40,40))
     }
+    let ref font = mgr.asset_path("FiraSans-Regular.ttf");
     world.add_resource(mgr);
-
-    // let ref font = assets.join("FiraSans-Regular.ttf");
-    // let factory = window.factory.clone();
-    // let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
+    let factory = window.factory.clone();
+    let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
     world.add_resource(FPS(0));
     // let image   = Image::new().rect(graphics::rectangle::square(0.0, 0.0, 200.0));
     
@@ -74,7 +81,10 @@ fn main() {
             }
             // let _guard = flame::start_guard("render");
             let mut render = render_system::System(&mut window, &event);
-            render.run_now(&mut world.res);
+            use specs::{System, SystemData};
+            let data = render.fetch(&mut world);
+            render.run(data, &mut glyphs);
+            // render.run_now(&mut world.res);
 
         }
 

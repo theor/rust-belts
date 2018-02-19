@@ -1,3 +1,5 @@
+use specs::World;
+use piston_window::Glyphs;
 use specs::{Fetch, ReadStorage, System as BaseSystem};
 use piston_window::{Event, PistonWindow};
 use resmgr::ResMgr;
@@ -5,16 +7,27 @@ use components::*;
 
 pub struct System<'a>(pub &'a mut PistonWindow, pub &'a Event); //gfx_graphics::back_end::GfxGraphics<'_, gfx_device_gl::Resources, gfx_device_gl::command::CommandBuffer>);
 
+
 impl<'a> BaseSystem<'a> for System<'a> {
     type SystemData = (
+        Fetch<'a, FPS>,
         Fetch<'a, Camera>,
         Fetch<'a, ResMgr>,
         ReadStorage<'a, Position>,
         ReadStorage<'a, Renderer>,
     );
 
-    fn run(&mut self, (cam, res, pos, renderer): Self::SystemData) {
-        self.0.draw_2d(self.1, |context, graphics| {
+    fn run(&mut self, _: Self::SystemData) {}
+}
+
+impl<'a> System<'a> {
+    pub fn fetch(&self, world: &'a mut World) -> <Self as BaseSystem<'a>>::SystemData {
+        use specs::SystemData;
+        <Self as BaseSystem<'a>>::SystemData::fetch(&mut world.res, 0)
+    }
+    pub fn run(&mut self, (fps, cam, res, pos, renderer): <Self as BaseSystem<'a>>::SystemData, font:&mut Glyphs) {
+        let w = { &mut (self.0) };
+        w.draw_2d(self.1, |context, graphics| {
             use specs::Join;
             use piston_window::*;
 
@@ -51,13 +64,11 @@ impl<'a> BaseSystem<'a> for System<'a> {
                 // println!("Hello, {:?}", &position);
             }
             
-            let mgr_read = mgr.read();
-            let font = mgr_read.as_ref().unwrap().get_font();
-            let mut glyphs_guard = font.write().unwrap();
-            let mut glyphs = &mut *glyphs_guard;
+           
+            let fps = fps.0;
             let transform = context.transform.trans(10.0, 100.0);
             text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32)
-                .draw("Hello world!", glyphs, &context.draw_state, transform, graphics)
+                .draw(&format!("{}fps", fps), font, &context.draw_state, transform, graphics)
                 .unwrap();
         });
     }

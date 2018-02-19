@@ -4,7 +4,7 @@ use find_folder;
 use piston_window::{G2dTexture, GfxFactory, Texture, TextureSettings, Flip};
 
 pub struct ResMgr {
-    assets_path: std::path::PathBuf,
+    pub assets_path: std::path::PathBuf,
     assets: HashMap<&'static str, Sheet>,
 }
 
@@ -25,6 +25,11 @@ impl ResMgr {
             assets: HashMap::new(),
         }
     }
+
+    pub fn asset_path(&self, path: &'static str) -> std::path::PathBuf {
+        self.assets_path.join(path)
+    }
+
     pub fn load(&mut self, factory: &mut GfxFactory, path: &'static str, stride:u8, size: (u8,u8)){
         let belt_sheet = self.assets_path.join(path);
         let belt_image: G2dTexture = Texture::from_path(
