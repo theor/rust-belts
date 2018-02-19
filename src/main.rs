@@ -26,8 +26,8 @@ mod factory;
 
 use fps_counter::FPSCounter;
 use piston_window::*;
-use specs::{DispatcherBuilder, World, RunNow};
-use components::{FPS, DeltaTime};
+use specs::prelude::{DispatcherBuilder, World, RunNow};
+use components::{FPS, DeltaTime, Grid};
 
 fn main() {
     let mut world = World::new();
@@ -48,10 +48,10 @@ fn main() {
     // factory::item(&mut world, 1, 0);
     // factory::item(&mut world, 0, 1);
 
-    let mut dispatcher = DispatcherBuilder::new()
-        .add(move_system::System::new(), "move", &[])
-        .add(update_pos_system::System, "update_pos_system", &["move"])
-        .build();
+    let mut dispatcher = DispatcherBuilder::new();
+        dispatcher.add(move_system::System::new(), "move", &[]);
+        dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
+    let mut dispatcher = dispatcher.build();
 
     let mut window: PistonWindow = WindowSettings::new("Hello Piston!", [640, 480])
         .exit_on_esc(true)
@@ -68,6 +68,7 @@ fn main() {
     let factory = window.factory.clone();
     let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
     world.add_resource(FPS(0));
+    world.add_resource(Grid::new());
     // let image   = Image::new().rect(graphics::rectangle::square(0.0, 0.0, 200.0));
     
     grid_system::System::new().run_now(&mut world.res);

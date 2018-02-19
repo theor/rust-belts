@@ -1,6 +1,6 @@
-use specs::World;
+use specs::prelude::*;
+use specs::prelude::System as BaseSystem;
 use piston_window::Glyphs;
-use specs::{Fetch, ReadStorage, System as BaseSystem};
 use piston_window::{Event, PistonWindow};
 use resmgr::ResMgr;
 use components::*;
@@ -22,13 +22,11 @@ impl<'a> BaseSystem<'a> for System<'a> {
 
 impl<'a> System<'a> {
     pub fn fetch(&self, world: &'a mut World) -> <Self as BaseSystem<'a>>::SystemData {
-        use specs::SystemData;
-        <Self as BaseSystem<'a>>::SystemData::fetch(&mut world.res, 0)
+        <Self as BaseSystem<'a>>::SystemData::fetch(&mut world.res)
     }
     pub fn run(&mut self, (fps, cam, res, pos, renderer): <Self as BaseSystem<'a>>::SystemData, font:&mut Glyphs) {
         let w = { &mut (self.0) };
         w.draw_2d(self.1, |context, graphics| {
-            use specs::Join;
             use piston_window::*;
 
             clear([1.0; 4], graphics);

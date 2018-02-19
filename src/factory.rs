@@ -1,4 +1,4 @@
-use specs::*;
+use specs::prelude::*;
 use components::*;
 
 pub fn init(world: &mut World) {

@@ -5,9 +5,9 @@ authors = ["theor <theo.richart@gmail.com>"]
 
 [dependencies]
 piston_window = "0.76.0"
-specs = "*"
+specs = { git = "https://github.com/slide-rs/specs" }
 rayon = "*"
-specs-derive = "*"
+specs-derive = { git = "https://github.com/slide-rs/specs" }
 find_folder = "*"
 # image = "*"
 piston2d-sprite = "*"

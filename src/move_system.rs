@@ -1,5 +1,5 @@
 use specs;
-use specs::{Fetch, ReadStorage, WriteStorage};
+use specs::prelude::*;
 
 use components::*;
 // use piston::graphics;
@@ -13,17 +13,17 @@ impl System {
     }
 }
 
-impl<'a> specs::System<'a> for System {
+impl<'a> specs::prelude::System<'a> for System {
     type SystemData = (Fetch<'a, DeltaTime>,
+                       Fetch<'a, Grid>,
+                       Entities<'a>,
                        ReadStorage<'a, Belt>,
                        ReadStorage<'a, Item>,
                        ReadStorage<'a, GridItem>,
                        WriteStorage<'a, GridVelocity>);
 
-    fn run(&mut self, (_delta, belt, item, grid, mut vel): Self::SystemData) {
+    fn run(&mut self, (_delta, gridq, entities, belt, item, grid, mut vel): Self::SystemData) {
         use rayon::prelude::*;
-        use specs::ParJoin;
-        use specs::Join;
 
         // belts -> items
         // for (_belt, belt_grid) in (&belt, &grid).join() {
@@ -45,12 +45,26 @@ impl<'a> specs::System<'a> for System {
         // });
 
         
+        // // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
+        // for belt in (&belt).join() {
+        //     for item_id in belt.items.iter() {
+        //         let mut vel = vel.get_mut(*item_id).unwrap();
+        //         vel.dx = 10;
+        //     }
+        //  }//);
+
+        
         // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
-        for belt in (&belt).join() {
-            for item_id in belt.items.iter() {
-                let mut vel = vel.get_mut(*item_id).unwrap();
-                vel.dx = 10;
+        for (_belt, belt_grid) in (&belt, &grid).join() {
+            let m = (*gridq).0.read().unwrap();
+            if let Some(v) = m.get(&(belt_grid.ix, belt_grid.iy)) {
+                for item_id in v.iter() {
+                    let mut vel = vel.get_mut((*entities).entity(*item_id)).unwrap();
+                    vel.dx = 10;
+                    
+                }
             }
-         }//);reads
+        // });
+        }
     }
 }

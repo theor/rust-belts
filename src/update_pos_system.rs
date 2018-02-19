@@ -1,19 +1,18 @@
 use specs;
-use specs::{WriteStorage};
+use specs::prelude::*;
 
 use components::*;
 // use piston::graphics;
 
 pub struct System;
 
-impl<'a> specs::System<'a> for System {
+impl<'a> specs::prelude::System<'a> for System {
     type SystemData = (WriteStorage<'a, GridItem>,
                        WriteStorage<'a, GridVelocity>,
                        WriteStorage<'a, Position>);
 
     fn run(&mut self, (mut grid, mut grid_vel, mut pos): Self::SystemData) {
         use rayon::prelude::*;
-        use specs::ParJoin;
 
         (&mut grid, &mut grid_vel)
           .par_join()

@@ -1,12 +1,22 @@
-use specs::{DenseVecStorage,VecStorage};
-use specs::Entity;
+use specs::prelude::*;
+use specs::world::Index;
+use std::collections::HashMap;
+use std::sync::RwLock;
+use std::sync::Arc;
 
 pub struct DeltaTime(pub f32);
 pub struct Camera(pub f32, pub f32);
 pub struct FPS(pub usize);
+pub struct Grid(pub Arc<RwLock<HashMap<(u32,u32), Vec<Index>>>>);
+
+impl Grid {
+    pub fn new() -> Self {
+        Grid(Arc::new(RwLock::new(HashMap::new())))
+    }
+}
 
 #[derive(Component, Debug)]
-#[component(VecStorage)]
+#[storage(VecStorage)]
 pub struct Position {
     pub x: f32,
     pub y: f32
@@ -22,7 +32,7 @@ impl Position {
 }
 
 #[derive(Component, Debug)]
-#[component(VecStorage)]
+#[storage(VecStorage)]
 pub struct GridItem {
     pub ix: u32,
     pub iy: u32,
@@ -59,7 +69,7 @@ impl GridItem {
 }
 
 #[derive(Component, Debug)]
-#[component(VecStorage)]
+#[storage(VecStorage)]
 pub struct GridVelocity {
     pub dx: i16,
     pub dy: i16,
@@ -72,7 +82,7 @@ impl GridVelocity {
 }
 
 #[derive(Component, Debug)]
-#[component(DenseVecStorage)]
+#[storage(DenseVecStorage)]
 pub struct Belt {
     pub items: Vec<Entity>,
 }
@@ -82,12 +92,12 @@ impl Belt {
 }
 
 #[derive(Component, Debug)]
-#[component(DenseVecStorage)]
+#[storage(DenseVecStorage)]
 pub struct Item {
 }
 
 #[derive(Component, Debug)]
-#[component(VecStorage)]
+#[storage(VecStorage)]
 pub enum Renderer {
     SpriteSheet(Sprite),
     Shape(Shape),
