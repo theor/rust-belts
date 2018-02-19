@@ -113,6 +113,7 @@ mod tests {
     pub fn bench(b: &mut Bencher) {
         let mut world = World::new();
         factory::init(&mut world);
+        world.add_resource(Grid::new());
         
         for j in 0..100 {
             for i in 0..100 {
@@ -125,13 +126,12 @@ mod tests {
         
         grid_system::System::new().run_now(&mut world.res);
 
-        let mut dispatcher = DispatcherBuilder::new()
-            .add(move_system::System::new(), "move", &[])
-            .add(update_pos_system::System, "update_pos_system", &["move"])
-            .build();
+        let mut dispatcher = DispatcherBuilder::new();
+        dispatcher.add(move_system::System::new(), "move", &[]);
+        dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
+        let mut dispatcher = dispatcher.build();
 
         b.iter(||{
-            use specs::RunNow;
             move_system::System::new().run_now(&mut world.res);
             // dispatcher.dispatch(&mut world.res);
         });
