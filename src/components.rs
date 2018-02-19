@@ -1,4 +1,5 @@
 use specs::{DenseVecStorage,VecStorage};
+use specs::Entity;
 
 pub struct DeltaTime(pub f32);
 pub struct Camera(pub f32, pub f32);
@@ -73,6 +74,11 @@ impl GridVelocity {
 #[derive(Component, Debug)]
 #[component(DenseVecStorage)]
 pub struct Belt {
+    pub items: Vec<Entity>,
+}
+
+impl Belt {
+    pub fn new() -> Self { Belt { items: Vec::with_capacity(8) } }
 }
 
 #[derive(Component, Debug)]

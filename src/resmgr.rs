@@ -12,6 +12,7 @@ pub struct Sheet {
     pub image: G2dTexture,
     pub stride:u8,
     pub size: (u8,u8),
+    pub offset: (u8,u8),
 }
 
 impl ResMgr {
@@ -30,7 +31,7 @@ impl ResMgr {
         self.assets_path.join(path)
     }
 
-    pub fn load(&mut self, factory: &mut GfxFactory, path: &'static str, stride:u8, size: (u8,u8)){
+    pub fn load(&mut self, factory: &mut GfxFactory, path: &'static str, stride:u8, size: (u8,u8), offset: (u8,u8)){
         let belt_sheet = self.assets_path.join(path);
         let belt_image: G2dTexture = Texture::from_path(
                 factory,
@@ -38,7 +39,7 @@ impl ResMgr {
                 Flip::None,
                 &TextureSettings::new()
             ).unwrap();
-        self.assets.insert(path, Sheet {image: belt_image, stride: stride, size: size});
+        self.assets.insert(path, Sheet {image: belt_image, stride: stride, size: size, offset: offset});
     }
 
     pub fn try_get(&self, name: &'static str) -> Option<&Sheet> {

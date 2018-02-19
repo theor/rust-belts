@@ -18,14 +18,15 @@ pub fn belt(world: &mut World, x: u32, y: u32) -> Entity {
             .with(Position::new())
             .with(GridItem::new(x, y))
             .with(Renderer::sprite("transport-belt.png", (0u8,0u8)))
-            .with(Belt{})
+            .with(Belt::new())
             .build()
 }
 
 pub fn item(world: &mut World, x: u32, y: u32) -> Entity {
     world.create_entity()
         .with(Position::new())
-        .with(Renderer::shape((16u8,16u8)))
+        // .with(Renderer::shape((16u8,16u8)))
+        .with(Renderer::sprite("copper-plate.png", (0u8,0u8)))
         .with(GridItem::new(x, y))
         .with(GridVelocity::new())
         .with(Item{})

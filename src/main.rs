@@ -18,6 +18,7 @@ mod components;
 mod render_system;
 mod move_system;
 mod update_pos_system;
+mod grid_system;
 mod resmgr;
 mod factory;
 // mod quadtree;
@@ -25,27 +26,27 @@ mod factory;
 
 use fps_counter::FPSCounter;
 use piston_window::*;
-use specs::{DispatcherBuilder, World, };
+use specs::{DispatcherBuilder, World, RunNow};
 use components::{FPS, DeltaTime};
 
 fn main() {
     let mut world = World::new();
     factory::init(&mut world);
     
-    //  for j in 0..100 {
-    //         for i in 0..100 {
-    //             factory::belt(&mut world, i, j);
-    //         }
-    //         for i in 0..10 {
-    //             factory::item(&mut world, i, j);
-    //         }
-    //     }
-    for i in 0..10 {
-        factory::belt(&mut world, i, 0);
-    }
-    factory::item(&mut world, 0, 0);
-    factory::item(&mut world, 1, 0);
-    factory::item(&mut world, 0, 1);
+     for j in 0..100 {
+            for i in 0..100 {
+                factory::belt(&mut world, i, j);
+            }
+            for i in 0..10 {
+                factory::item(&mut world, i, j);
+            }
+        }
+    // for i in 0..10 {
+    //     factory::belt(&mut world, i, 0);
+    // }
+    // factory::item(&mut world, 0, 0);
+    // factory::item(&mut world, 1, 0);
+    // factory::item(&mut world, 0, 1);
 
     let mut dispatcher = DispatcherBuilder::new()
         .add(move_system::System::new(), "move", &[])
@@ -59,7 +60,8 @@ fn main() {
 
     let mut mgr = resmgr::ResMgr::new();
     {
-        mgr.load(&mut window.factory, "transport-belt.png", 16, (40,40))
+        mgr.load(&mut window.factory, "transport-belt.png", 16, (40,40), (4,4));
+        mgr.load(&mut window.factory, "copper-plate.png", 1, (32,32), (0,0));
     }
     let ref font = mgr.asset_path("FiraSans-Regular.ttf");
     world.add_resource(mgr);
@@ -68,12 +70,12 @@ fn main() {
     world.add_resource(FPS(0));
     // let image   = Image::new().rect(graphics::rectangle::square(0.0, 0.0, 200.0));
     
+    grid_system::System::new().run_now(&mut world.res);
     let mut counter = FPSCounter::new();
 
     while let Some(event) = window.next() {
 
         if let Some(_r) = event.render_args() {
-            use specs::RunNow;
 
              {
                 let mut delta = world.write_resource::<FPS>();
@@ -81,7 +83,6 @@ fn main() {
             }
             // let _guard = flame::start_guard("render");
             let mut render = render_system::System(&mut window, &event);
-            use specs::{System, SystemData};
             let data = render.fetch(&mut world);
             render.run(data, &mut glyphs);
             // render.run_now(&mut world.res);
@@ -120,11 +121,13 @@ mod tests {
                 factory::item(&mut world, i, j);
             }
         }
+        
+        grid_system::System::new().run_now(&mut world.res);
 
         let mut dispatcher = DispatcherBuilder::new()
-        .add(move_system::System::new(), "move", &[])
-        .add(update_pos_system::System, "update_pos_system", &["move"])
-        .build();
+            .add(move_system::System::new(), "move", &[])
+            .add(update_pos_system::System, "update_pos_system", &["move"])
+            .build();
 
         b.iter(||{
             use specs::RunNow;
