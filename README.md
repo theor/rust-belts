@@ -3,3 +3,4 @@
          10,884,685 ns/iter (+/- 2,657,142)     items -> par belts
              42,826 ns/iter (+/- 5,720)         per belt items list
              83,712 ns/iter (+/- 12,581)        per belt items list, par mutex
+            132,643 ns/iter (+/- 30,206)        lazy update

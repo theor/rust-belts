@@ -47,11 +47,11 @@ impl<'a> specs::System<'a> for System {
         // });
 
         
-        (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
-                for item_id in belt.items.iter() {
-                    updater.insert(*item_id, GridVelocity { dx: 10, dy: 0});
-                }
-        });
+        // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
+        //         for item_id in belt.items.iter() {
+        //             // updater.insert(*item_id, GridVelocity { dx: 10, dy: 0});
+        //         }
+        // });
         // for belt in (&belt).join() {
         //     for item_id in belt.items.iter() {
         //         let mut vel = vel.get_mut(*item_id).unwrap();
