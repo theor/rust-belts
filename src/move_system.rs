@@ -1,5 +1,6 @@
+use specs::LazyUpdate;
 use specs;
-use specs::{Fetch, ReadStorage, WriteStorage};
+use specs::{Fetch, ReadStorage, WriteStorage, Entities};
 
 use components::*;
 // use piston::graphics;
@@ -18,9 +19,10 @@ impl<'a> specs::System<'a> for System {
                        ReadStorage<'a, Belt>,
                        ReadStorage<'a, Item>,
                        ReadStorage<'a, GridItem>,
-                       WriteStorage<'a, GridVelocity>);
+                       WriteStorage<'a, GridVelocity>,
+                       Fetch<'a, LazyUpdate>);
 
-    fn run(&mut self, (_delta, belt, item, grid, mut vel): Self::SystemData) {
+    fn run(&mut self, (_delta, belt, item, grid, mut vel, updater): Self::SystemData) {
         use rayon::prelude::*;
         use specs::ParJoin;
         use specs::Join;
@@ -45,12 +47,16 @@ impl<'a> specs::System<'a> for System {
         // });
 
         
-        // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
-        for belt in (&belt).join() {
-            for item_id in belt.items.iter() {
-                let mut vel = vel.get_mut(*item_id).unwrap();
-                vel.dx = 10;
-            }
-         }//);reads
+        (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
+                for item_id in belt.items.iter() {
+                    updater.insert(*item_id, GridVelocity { dx: 10, dy: 0});
+                }
+        });
+        // for belt in (&belt).join() {
+        //     for item_id in belt.items.iter() {
+        //         let mut vel = vel.get_mut(*item_id).unwrap();
+        //         vel.dx = 10;
+        //     }
+        //  }//);reads
     }
 }

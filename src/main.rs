@@ -96,6 +96,7 @@ fn main() {
             }
             let _guard = flame::start_guard("update");
             dispatcher.dispatch(&mut world.res);
+            world.maintain();
         }
     }
 

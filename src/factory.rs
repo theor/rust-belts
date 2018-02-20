@@ -28,7 +28,7 @@ pub fn item(world: &mut World, x: u32, y: u32) -> Entity {
         // .with(Renderer::shape((16u8,16u8)))
         .with(Renderer::sprite("copper-plate.png", (0u8,0u8)))
         .with(GridItem::new(x, y))
-        .with(GridVelocity::new())
+        // .with(GridVelocity::new())
         .with(Item{})
         .build()
 }
