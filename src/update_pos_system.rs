@@ -17,8 +17,8 @@ impl<'a> specs::System<'a> for System {
         use rayon::prelude::*;
         use specs::ParJoin;
 
-        (entities, &mut grid, &mut grid_vel)
-          .join()
+        (&*entities, &mut grid, &grid_vel)
+          .par_join()
           .for_each(|(e, grid, grid_vel)|{
               grid.move_delta(grid_vel.dx, grid_vel.dy);
               updater.remove::<GridVelocity>(e);
