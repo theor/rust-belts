@@ -894,6 +894,7 @@ dependencies = [
  "find_folder 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "flame 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "fps_counter 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hibitset 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston2d-graphics 0.25.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston2d-sprite 0.42.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston_window 0.76.0 (registry+https://github.com/rust-lang/crates.io-index)",

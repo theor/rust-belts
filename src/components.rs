@@ -50,6 +50,16 @@ impl GridItem {
             dy: 0u8,
         }
     }
+    
+    pub fn new_subpos(x: u32, y: u32, dx: u8, dy: u8) -> Self {
+        GridItem {
+            ix: x,
+            iy: y,
+            dx: dx,
+            dy: dy,
+        }
+    }
+
     pub fn move_delta(&mut self, x: i16, y: i16) {
         if x >= 0 {
             let new_dx = self.dx as u32 + x as u32;

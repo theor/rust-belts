@@ -17,16 +17,26 @@ pub fn belt(world: &mut World, x: u32, y: u32) -> Entity {
     world.create_entity()
             .with(Position::new())
             .with(GridItem::new(x, y))
-            .with(Renderer::sprite("transport-belt.png", (0u8,0u8)))
+            .with(Renderer::sprite("transport-belt.png", (40u8,40u8)))
             .with(Belt::new())
             .build()
 }
 
+pub fn item_subpos(world: &mut World, x: u32, y: u32, dx: u8, dy: u8) -> Entity {
+    world.create_entity()
+        .with(Position::new())
+        // .with(Renderer::shape((16u8,16u8)))
+        .with(Renderer::sprite("copper-plate.png", (20u8,20u8)))
+        .with(GridItem::new_subpos(x, y, dx, dy))
+        .with(GridVelocity::new())
+        .with(Item{})
+        .build()
+}
 pub fn item(world: &mut World, x: u32, y: u32) -> Entity {
     world.create_entity()
         .with(Position::new())
         // .with(Renderer::shape((16u8,16u8)))
-        .with(Renderer::sprite("copper-plate.png", (0u8,0u8)))
+        .with(Renderer::sprite("copper-plate.png", (20u8,20u8)))
         .with(GridItem::new(x, y))
         .with(GridVelocity::new())
         .with(Item{})

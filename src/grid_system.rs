@@ -39,15 +39,15 @@ impl<'a> specs::prelude::System<'a> for System {
         });
 
         // items -> par belts
-        // (&grid, &item, &mut vel).par_join().for_each(|(item_grid, _item, vel)| {
-        // (&mut belt, &grid).par_join().for_each(|(belt, belt_grid)| {
-        //     belt.items.clear();   
-        //     for (item_grid, _item, e) in (&grid, &item, &*entities).join() {
-        //         if item_grid.ix == belt_grid.ix &&
-        //            item_grid.iy == belt_grid.iy {
-        //             belt.items.push(e)
-        //         }
-        //     }
-        // });
+        // (&grid, &item).par_join().for_each(|(item_grid, _item)| {
+        (&mut belt, &grid_item).par_join().for_each(|(belt, belt_grid)| {
+            belt.items.clear();   
+            for (item_grid, _item, e) in (&grid_item, &item, &*entities).join() {
+                if item_grid.ix == belt_grid.ix &&
+                   item_grid.iy == belt_grid.iy {
+                    belt.items.push(e)
+                }
+            }
+        });
     }
 }

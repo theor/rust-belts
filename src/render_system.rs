@@ -42,7 +42,9 @@ impl<'a> System<'a> {
                 match renderer {
                     &Renderer::SpriteSheet(ref sprite) => {
                         let img = (*res).try_get(sprite.sheet).unwrap();
-                        let pimage = Image::new().src_rect([img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64]);
+                        let pimage = Image::new()
+                            .src_rect([img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64])
+                            .rect([0.0, 0.0, sprite.rect.0 as f64, sprite.rect.1 as f64]);
                         pimage.draw(
                             &img.image,
                             &context.draw_state,

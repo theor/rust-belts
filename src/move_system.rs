@@ -52,19 +52,37 @@ impl<'a> specs::prelude::System<'a> for System {
         //         vel.dx = 10;
         //     }
         //  }//);
-
         
         // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
-        for (_belt, belt_grid) in (&belt, &grid).join() {
-            let m = (*gridq).0.read().unwrap();
-            if let Some(v) = m.get(&(belt_grid.ix, belt_grid.iy)) {
-                for item_id in v.iter() {
-                    let mut vel = vel.get_mut((*entities).entity(*item_id)).unwrap();
-                    vel.dx = 10;
-                    
-                }
+        (&belt).par_join().for_each(|belt| {
+            for item_id in belt.items.iter() {
+                let vel = vel.get(*item_id).unwrap();
+                let pvel = vel as *const GridVelocity;
+                unsafe { 
+                    let mpvel = pvel as *mut GridVelocity;
+                    (*mpvel).dx = 10;
+                 }
+                // vel.dx = 10;
             }
+         });
+
+        // let mut vr = vel.par_restrict_mut();
+        
+        // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
+        // for (_belt, belt_grid) in (&belt, &grid).join() {
+        //     let m = (*gridq).0.read().unwrap();
+        //     if let Some(v) = m.get(&(belt_grid.ix, belt_grid.iy)) {
+        //         let mut items = BitSet::new();
+        //         for item_id in v.iter() {
+        //             items.add(*item_id);
+        //         }
+        //         for (e,(v,mut s)) in (&items, &mut vr).join() {
+        //             let vel = s.get_mut_unchecked(&v);
+        //             vel.dx = 10;
+                    
+        //         }
+        //     }
         // });
-        }
+        // }
     }
 }
