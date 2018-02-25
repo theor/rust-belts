@@ -29,13 +29,15 @@ impl<'a> System<'a> {
         w.draw_2d(self.1, |context, graphics| {
             use piston_window::*;
 
-            clear([1.0; 4], graphics);
+            clear([0.5,0.5,0.5, 1.0], graphics);
 
             // TODO: batch:
             // http://docs.piston.rs/mush/src/graphics/image.rs.html#99
             // http://docs.piston.rs/mush/src/opengl_graphics/back_end.rs.html#379
             use std::iter::Iterator;
             let mut iter = (&pos, &renderer).join();
+            let mut i = 6;
+            let mut x = None; 
 
             let img = (*res).try_get(0);
             let source_rectangle = [img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64];
@@ -49,39 +51,51 @@ impl<'a> System<'a> {
                         .transform
                         .trans(cam.0 as f64, cam.1 as f64),
                     || {
-                        if let Some((position, renderer)) = iter.next() {
+                        if i == 6 {
+                            x = iter.next();
+                            i = 0;
+                        }
+                        if let Some((position, renderer)) = x {
                             match renderer {
                                 &Renderer::SpriteSheet(ref sprite) => {
-                                    let img = (*res).try_get(sprite.sheet);
-                                    let source_rectangle = [img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64];
+                                    let (x, y, w, h) = (0.0, 0.0, sprite.rect.0 as f64, sprite.rect.1 as f64);
+                                    let (x2, y2) = (x + w, y + h);
+                                    i += 1;
+                                     let m = math::identity()
+                                         .trans(position.x as f64, position.y as f64);
+                                    use triangulation::{tx,ty};
                                     
-                                    None
+                                    let res = match i {
+                                        1 => Some([tx(m,x,y) as f64, ty(m,x,y) as f64]),
+                                        2 => Some([tx(m,x2,y) as f64, ty(m,x2,y) as f64]),
+                                        3 => Some([tx(m,x,y2) as f64, ty(m,x,y2) as f64]),
+                                        4 => Some([tx(m,x2,y) as f64, ty(m,x2,y) as f64]),
+                                        5 => Some([tx(m,x2,y2) as f64, ty(m,x2,y2) as f64]),
+                                        6 => Some([tx(m,x,y2) as f64, ty(m,x,y2) as f64]),
+                                        _ => { println!("i none {}", i); None },
+                                    };
+                                    println!("res {:?} i {}", res, i);
+                                    res
                                 },
-                                _ => None,
+                                _ => { println!("shape none"); None },
                             }
                         } else {
+                            println!("end none");
                             None
                         }
                     },
-                    |xy| {f(xy, uvs)})
+                    |xy| {
+                        use std::slice::Iter;
+                        let uvs: Vec<[f32;2]> = uvs.iter().cloned().cycle().take(xy.len()).collect::<Vec<[f32;2]>>();
+                        println!("XYs {}", xy.len());
+                        println!("{:?}", xy);
+                        println!("{:?}", uvs);
+                        f(xy, &uvs)
+                    })
                 }
             );
 
-            if let Some((position, renderer)) = iter.next() {
-                
-                match renderer {
-                    &Renderer::SpriteSheet(ref sprite) => {
-                        let img = (*res).try_get(sprite.sheet);
-                        let source_rectangle = [img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64];
-                        let transform = context
-                                .transform
-                                .trans(cam.0 as f64, cam.1 as f64)
-                                .trans(position.x as f64, position.y as f64);
            
-                    },
-                    _ => (),
-                }
-            // }
 
 
             // for (position, renderer) in (&pos, &renderer).join() {
