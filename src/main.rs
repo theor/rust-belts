@@ -34,18 +34,20 @@ fn main() {
     let mut world = World::new();
     factory::init(&mut world);
     
+    factory::belt(&mut world, 0, 0);
+    factory::item_subpos(&mut world, 1, 1, 0, 0);
     // 10k belts, 80k items: 60fps
-     for j in 0..1000 {
-            for i in 0..100 {
-                factory::belt(&mut world, i, j);
-            }
-            for i in 0..250 {
-                for d in 0..4 {
-                    factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
-                    factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
-                }
-            }
-        }
+    //  for j in 0..1000 {
+    //         for i in 0..100 {
+    //             factory::belt(&mut world, i, j);
+    //         }
+    //         for i in 0..250 {
+    //             for d in 0..4 {
+    //                 factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
+    //                 factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
+    //             }
+    //         }
+    //     }
     println!("Init done");
     // for i in 0..10 {
     //     factory::belt(&mut world, i, 0);
