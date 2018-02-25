@@ -14,15 +14,10 @@ impl System {
 }
 
 impl<'a> specs::prelude::System<'a> for System {
-    type SystemData = (Fetch<'a, DeltaTime>,
-                       Fetch<'a, Grid>,
-                       Entities<'a>,
-                       ReadStorage<'a, Belt>,
-                       ReadStorage<'a, Item>,
-                       ReadStorage<'a, GridItem>,
+    type SystemData = (ReadStorage<'a, Belt>,
                        WriteStorage<'a, GridVelocity>);
 
-    fn run(&mut self, (_delta, gridq, entities, belt, item, grid, mut vel): Self::SystemData) {
+    fn run(&mut self, (belt, mut vel): Self::SystemData) {
         use rayon::prelude::*;
 
         // belts -> items
@@ -56,13 +51,16 @@ impl<'a> specs::prelude::System<'a> for System {
         // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
         (&belt).par_join().for_each(|belt| {
             for item_id in belt.items.iter() {
-                let vel = vel.get(*item_id).unwrap();
-                let pvel = vel as *const GridVelocity;
-                unsafe { 
-                    let mpvel = pvel as *mut GridVelocity;
-                    (*mpvel).dx = 10;
-                 }
-                // vel.dx = 10;
+                match vel.get(*item_id) {
+                    Some (vel) => {
+                        let pvel = vel as *const GridVelocity;
+                        unsafe { 
+                            let mpvel = pvel as *mut GridVelocity;
+                            (*mpvel).dx = 10;
+                        }
+                    },
+                    None => (),
+                }
             }
          });
 

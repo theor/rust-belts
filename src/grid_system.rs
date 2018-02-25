@@ -6,11 +6,15 @@ use specs;
 
 use components::*;
 // use piston::graphics;
-
-pub struct System();
+use ntree::{Region, NTree};
+type GridTree = NTree<GridRegion, RegionItem>;
+pub struct System(GridTree);
 
 impl System {
-    pub fn new() -> Self { System{}}
+    pub fn new() -> Self {
+        let r = GridRegion(0,0,1024,1024);
+        System(GridTree::new(r,10))
+    }
 }
 
 impl<'a> specs::prelude::System<'a> for System {
@@ -33,21 +37,29 @@ impl<'a> specs::prelude::System<'a> for System {
         //     }
         // }
 
-        (&grid_item, &item, &*entities).par_join().for_each(|(item_grid, _item, e)| {
-            let mut l = (*grid).0.write().unwrap();
-            (*l.entry((item_grid.ix, item_grid.iy)).or_insert(Vec::with_capacity(8))).push(e.id());
-        });
+        // (&grid_item, &item, &*entities).par_join().for_each(|(item_grid, _item, e)| {
+        //     let mut l = (*grid).0.write().unwrap();
+        //     (*l.entry((item_grid.ix, item_grid.iy)).or_insert(Vec::with_capacity(8))).push(e.id());
+        // });
 
+        (&*entities, &grid_item).join().for_each(|(belt_entity, belt_grid)| {
+            self.0.insert(RegionItem::new(belt_grid.ix, belt_grid.iy, belt_entity));
+        });
         // items -> par belts
         // (&grid, &item).par_join().for_each(|(item_grid, _item)| {
-        (&mut belt, &grid_item).par_join().for_each(|(belt, belt_grid)| {
+        (&*entities, &mut belt, &grid_item).par_join().for_each(|(belt_entity, belt, belt_grid)| {
+            let r = GridRegion(belt_grid.ix,belt_grid.iy,belt_grid.ix+1,belt_grid.iy+1);
+            let q = self.0.range_query(&r);
             belt.items.clear();   
-            for (item_grid, _item, e) in (&grid_item, &item, &*entities).join() {
-                if item_grid.ix == belt_grid.ix &&
-                   item_grid.iy == belt_grid.iy {
-                    belt.items.push(e)
-                }
+            for qi in q {
+                belt.items.push(qi.e);
             }
+            // for (item_grid, _item, e) in (&grid_item, &item, &*entities).join() {
+            //     if item_grid.ix == belt_grid.ix &&
+            //        item_grid.iy == belt_grid.iy {
+            //         belt.items.push(e)
+            //     }
+            // }
         });
     }
 }

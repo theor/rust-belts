@@ -35,41 +35,41 @@ impl<'a> System<'a> {
             // http://docs.piston.rs/mush/src/graphics/image.rs.html#99
             // http://docs.piston.rs/mush/src/opengl_graphics/back_end.rs.html#379
 
-            for (position, renderer) in (&pos, &renderer).join() {
-                if position.x < 0.0 || position.y < 0.0 || position.x > 500.0 || position.y > 500.0 {
-                    continue;
-                }
-                match renderer {
-                    &Renderer::SpriteSheet(ref sprite) => {
-                        let img = (*res).try_get(sprite.sheet).unwrap();
-                        let pimage = Image::new()
-                            .src_rect([img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64])
-                            .rect([0.0, 0.0, sprite.rect.0 as f64, sprite.rect.1 as f64]);
-                        pimage.draw(
-                            &img.image,
-                            &context.draw_state,
-                            context
-                                .transform
-                                .trans(cam.0 as f64, cam.1 as f64)
-                                .trans(position.x as f64, position.y as f64),
-                            graphics,
-                        );
-                    }
-                    &Renderer::Shape(ref shape) => {
-                        // ellipse(
-                        //     [1.0, 0.0, 0.0, 1.0],
-                        //     [0.0, 0.0, shape.rect.0 as f64, shape.rect.1 as f64],
-                        //     context
-                        //         .transform
-                        //         .trans(cam.0 as f64, cam.1 as f64)
-                        //         .trans(position.x as f64, position.y as f64),
-                        //     graphics,
-                        // );
-                    }
-                }
+            // for (position, renderer) in (&pos, &renderer).join() {
+            //     if position.x < 0.0 || position.y < 0.0 || position.x > 500.0 || position.y > 500.0 {
+            //         continue;
+            //     }
+            //     match renderer {
+            //         &Renderer::SpriteSheet(ref sprite) => {
+            //             let img = (*res).try_get(sprite.sheet).unwrap();
+            //             let pimage = Image::new()
+            //                 .src_rect([img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64])
+            //                 .rect([0.0, 0.0, sprite.rect.0 as f64, sprite.rect.1 as f64]);
+            //             pimage.draw(
+            //                 &img.image,
+            //                 &context.draw_state,
+            //                 context
+            //                     .transform
+            //                     .trans(cam.0 as f64, cam.1 as f64)
+            //                     .trans(position.x as f64, position.y as f64),
+            //                 graphics,
+            //             );
+            //         }
+            //         &Renderer::Shape(ref shape) => {
+            //             // ellipse(
+            //             //     [1.0, 0.0, 0.0, 1.0],
+            //             //     [0.0, 0.0, shape.rect.0 as f64, shape.rect.1 as f64],
+            //             //     context
+            //             //         .transform
+            //             //         .trans(cam.0 as f64, cam.1 as f64)
+            //             //         .trans(position.x as f64, position.y as f64),
+            //             //     graphics,
+            //             // );
+            //         }
+            //     }
 
-                // println!("Hello, {:?}", &position);
-            }
+            //     // println!("Hello, {:?}", &position);
+            // }
             
            
             let fps = fps.0;

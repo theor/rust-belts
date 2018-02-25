@@ -5,7 +5,8 @@ authors = ["theor <theo.richart@gmail.com>"]
 
 [dependencies]
 piston_window = "0.76.0"
-specs = { git = "https://github.com/slide-rs/specs" }
+# specs = { git = "https://github.com/slide-rs/specs" }
+specs = { path = "C:/Users/theor/.cargo/git/checkouts/specs-18d2bb2ce407da15/c2c450a" }
 rayon = "*"
 specs-derive = { git = "https://github.com/slide-rs/specs" }
 find_folder = "*"
@@ -15,4 +16,8 @@ piston2d-graphics = "*"
 flame = "*"
 fps_counter = "*"
 hibitset = "*"
+ntree = "*"
 # gfx = "*"
+
+[profile.release]
+debug = true

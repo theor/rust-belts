@@ -7,6 +7,7 @@ extern crate graphics;
 extern crate piston_window;
 extern crate rayon;
 extern crate specs;
+extern crate ntree;
 // extern crate sprite;
 #[macro_use]
 extern crate specs_derive;
@@ -34,11 +35,11 @@ fn main() {
     factory::init(&mut world);
     
     // 10k belts, 80k items: 60fps
-     for j in 0..100 {
+     for j in 0..1000 {
             for i in 0..100 {
                 factory::belt(&mut world, i, j);
             }
-            for i in 0..100 {
+            for i in 0..250 {
                 for d in 0..4 {
                     factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
                     factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
@@ -76,8 +77,10 @@ fn main() {
     world.add_resource(Grid::new());
     // let image   = Image::new().rect(graphics::rectangle::square(0.0, 0.0, 200.0));
     
+    println!("Grid System");
     grid_system::System::new().run_now(&mut world.res);
     let mut counter = FPSCounter::new();
+    println!("Start loop");
 
     while let Some(event) = window.next() {
 
@@ -112,22 +115,192 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::components::*;
     use test::Bencher;
 
+    #[test]
+    pub fn ntree_tests() {
+        let mut world = World::new();
+
+        use ntree::{Region, NTree};
+        let r = GridRegion(0,0,128,128);
+        let gizero = RegionItem::new(0, 0, world.create_entity().build());
+        assert_eq!(true, r.contains(&gizero));
+        assert_eq!(false, r.contains(&RegionItem::new(128, 128, world.create_entity().build())));
+        let mut tree = NTree::<GridRegion, RegionItem>::new(r, 8);
+        assert_eq!(true, tree.contains(&gizero));
+        assert_eq!(true, tree.contains(&RegionItem::new(32, 0, world.create_entity().build())));
+        tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
+        tree.insert(RegionItem::new(32, 0, world.create_entity().build()));
+        assert_eq!(true, tree.contains(&gizero));
+        assert_eq!(true, tree.contains(&RegionItem::new(32, 0, world.create_entity().build())));
+
+        let q = tree.range_query(&GridRegion(0,0,2,2)).collect::<Vec<&RegionItem>>();
+        assert_eq!(1, q.len());
+        
+        let q = tree.range_query(&GridRegion(1,1,2,2)).collect::<Vec<&RegionItem>>();
+        assert_eq!(0, q.len());
+        
+        let q = tree.range_query(&GridRegion(0,0,33,33)).collect::<Vec<&RegionItem>>();
+        assert_eq!(2, q.len());
+    }
+
     #[bench]
-    pub fn bench(b: &mut Bencher) {
+    pub fn bench_vec(b: &mut Bencher) {
+        let mut vels: Vec<GridVelocity> = (0..1000*1000).map(|i| { GridVelocity::new() }).collect();
+        b.iter(|| {
+            vels.iter_mut().for_each(|vel| {
+            // for vel in  {
+                vel.dx += 1;
+            });
+        });
+    } 
+    #[bench]
+    pub fn bench_vec_mutptr(b: &mut Bencher) {
+        let mut vels: Vec<GridVelocity> = (0..1000*1000).map(|i| { GridVelocity::new() }).collect();
+        b.iter(|| {
+            let ptr = vels.as_mut_ptr();
+            for i in (0..1000*1000) {
+                unsafe {
+                    let vel = ptr.offset((i as isize));
+                    (*vel).dx += 1;
+                }
+            };
+        });
+    } 
+    #[bench]
+    pub fn bench_vec_par_mutptr(b: &mut Bencher) {
+        let mut vels: Vec<GridVelocity> = (0..1000*1000).map(|i| { GridVelocity::new() }).collect();
+        b.iter(|| {
+            let ptr = vels.as_mut_ptr();
+            for i in (0..1000*1000) {
+                unsafe {
+                    let vel = ptr.offset((i as isize));
+                    (*vel).dx += 1;
+                }
+            };
+        });
+    } 
+
+    #[bench]
+    pub fn bench_vec_for(b: &mut Bencher) {
+        let mut vels: Vec<GridVelocity> = (0..1000*1000).map(|i| { GridVelocity::new() }).collect();
+        b.iter(|| {
+            for vel in vels.iter_mut() {
+            // for vel in  {
+                vel.dx += 1;
+            };
+        });
+    } 
+
+    #[bench]
+    pub fn bench_vec_par(b: &mut Bencher) {
+        let mut vels: Vec<GridVelocity> = (0..1000*1000).map(|i| { GridVelocity::new() }).collect();
+        use rayon::prelude::*;
+        b.iter(|| {
+            vels.par_iter_mut().for_each(|vel| {
+            // for vel in  {
+                vel.dx += 1;
+            });
+        });
+    } 
+    
+    #[bench]
+    pub fn bench_storage(b: &mut Bencher) {
+        let mut world = setup_world();
+        let mut vel_storage = world.write::<GridVelocity>();
+        let ents = world.entities();
+        b.iter(|| {
+        for i in 0..1000*1000 {
+            let e = ents.entity(i);
+        // for vel in  {
+            let mut vel = vel_storage.get_mut(e).unwrap();
+            vel.dx += 1;
+        }
+        });
+    }    
+    
+    #[bench]
+    pub fn bench_vecstorage(b: &mut Bencher) {
+        use std::default::Default;
+        use specs::prelude::*;
+        use specs::prelude::VecStorage;
+        use specs::storage::UnprotectedStorage;
+
+        let mut vel_storage: VecStorage<GridVelocity> = Default::default();
+        for i in 0..1000*1000 {
+            unsafe { vel_storage.insert(i, GridVelocity::new()); }
+        }
+        b.iter(|| {
+        for i in 0..1000*1000 {
+        // for vel in  {
+            let mut vel = unsafe { vel_storage.get_mut(i) };
+            vel.dx += 1;
+        }
+        });
+    }  
+    
+    #[bench]
+    pub fn bench_storage_entity_prefetch(b: &mut Bencher) {
+        use specs::prelude::Entity;
+        let mut world = setup_world();
+        let mut vel_storage = world.write::<GridVelocity>();
+        let ents = world.entities();
+        let entities: Vec<Entity> = (0..1000*1000).map(|i| ents.entity(i)).collect();
+        b.iter(|| {
+        for e in entities.iter() {
+        // for vel in  {
+            let mut vel = vel_storage.get_mut(*e).unwrap();
+            vel.dx += 1;
+        }
+        });
+    }   
+
+    #[bench]
+    pub fn bench_storage_par(b: &mut Bencher) {
+        let mut world = setup_world();
+        let mut vel_storage = world.write::<GridVelocity>();
+        let ents = world.entities();
+        use rayon::prelude::*;
+        let ids:Vec<u32> = (0..1000*1000).collect();
+        b.iter(|| {
+            ids.par_iter().for_each(|i| {
+                let e = ents.entity(*i);
+            // for vel in  {
+                unsafe {
+                    let vel = vel_storage.get(e).unwrap();
+                    let vel = vel as *const GridVelocity;
+                    let vel = vel as *mut GridVelocity;
+                    (*vel).dx += 1;
+                }
+            });
+        });
+    }
+
+    fn setup_world() -> World {
         let mut world = World::new();
         factory::init(&mut world);
         world.add_resource(Grid::new());
         
-        for j in 0..100 {
+       for j in 0..1000 {
+           for i in 0..250 {
+                for d in 0..4 {
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
+                }
+            }
+       }
+       for j in 0..100 {
             for i in 0..100 {
                 factory::belt(&mut world, i, j);
             }
-            for i in 0..10 {
-                factory::item(&mut world, i, j);
-            }
         }
+        world
+    }
+
+    #[bench]
+    pub fn bench(b: &mut Bencher) {
+        let mut world = setup_world();
         
         grid_system::System::new().run_now(&mut world.res);
 
