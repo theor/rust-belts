@@ -2,9 +2,9 @@
 
 extern crate find_folder;
 extern crate flame;
+extern crate ntree;
 extern crate rayon;
 extern crate specs;
-extern crate ntree;
 
 extern crate ggez;
 
@@ -31,9 +31,8 @@ use ggez::graphics;
 use std::env;
 use std::path;
 
-use specs::prelude::{Dispatcher, DispatcherBuilder, World, RunNow};
-use components::{FPS, DeltaTime};
-
+use specs::prelude::{Dispatcher, DispatcherBuilder, RunNow, World};
+use components::{DeltaTime, FPS};
 
 // First we make a structure to contain the game's state
 struct MainState {
@@ -55,29 +54,26 @@ impl MainState {
 
         let mut world = World::new();
         factory::init(&mut world);
-        
+
         let mut mgr = resmgr::ResMgr::new();
         {
-            mgr.load(ctx, "/transport-belt.png", 16, (40.0,40.0), (4.0,4.0));
-            mgr.load(ctx, "/copper-plate.png", 1, (32.0,32.0), (0.0,0.0));
+            mgr.load(ctx, "/transport-belt.png", 16, (40.0, 40.0), (4.0, 4.0));
+            mgr.load(ctx, "/copper-plate.png", 1, (32.0, 32.0), (0.0, 0.0));
         }
         world.add_resource(mgr);
-        
+
         for i in 0..10 {
             factory::belt(&mut world, i, 0);
         }
         factory::belt(&mut world, 0, 1);
         factory::item_subpos(&mut world, 1, 0, 0, 0);
         factory::item_subpos(&mut world, 0, 0, 0, 0);
-        
 
-        
         let mut dispatcher = DispatcherBuilder::new();
         dispatcher.add(move_system::System::new(), "move", &[]);
         // dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
         let mut dispatcher = dispatcher.build();
 
-        
         println!("Grid System");
         grid_system::System::new().run_now(&mut world.res);
 
@@ -107,8 +103,7 @@ impl event::EventHandler for MainState {
         }
 
         // Drawables are drawn from their top-left corner
-        let dest_point = graphics::Point2::new(10.0,
-                                               10.0);
+        let dest_point = graphics::Point2::new(10.0, 10.0);
         graphics::draw(ctx, &self.text, dest_point, 0.0)?;
         graphics::present(ctx);
         self.frames += 1;
@@ -139,11 +134,10 @@ pub fn main() {
     }
 }
 
-
 // fn main() {
 //     let mut world = World::new();
 //     factory::init(&mut world);
-    
+
 //     factory::belt(&mut world, 0, 0);
 //     factory::item_subpos(&mut world, 1, 1, 0, 0);
 //     // 10k belts, 80k items: 60fps
@@ -166,7 +160,6 @@ pub fn main() {
 //     // factory::item(&mut world, 1, 0);
 //     // factory::item(&mut world, 0, 1);
 
-
 //     let mut mgr = resmgr::ResMgr::new();
 //     {
 //         mgr.load(&mut window.factory, "transport-belt.png", 16, (40,40), (4,4));
@@ -174,12 +167,9 @@ pub fn main() {
 //     }
 //     world.add_resource(mgr);
 
-
 //             let mut render = render_system::System(&mut window, &event);
 //             let data = render.fetch(&mut world);
 //             render.run(data, &mut glyphs);
-
-
 
 //     use std::fs::File;
 //     flame::dump_html(&mut File::create("flame-graph.html").unwrap()).unwrap();
@@ -202,17 +192,19 @@ mod tests {
         factory::item_subpos(&mut world, 1, 0, 0, 0);
         factory::item_subpos(&mut world, 0, 0, 0, 0);
     }
-     #[test]
+    #[test]
     pub fn ntree_tests3() {
         let mut world = World::new();
-        use ntree::{Region, NTree};
-        let r = GridRegion(0,0,128,128);
+        use ntree::{NTree, Region};
+        let r = GridRegion(0, 0, 128, 128);
         let mut tree = NTree::<GridRegion, RegionItem>::new(r, 8);
         tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
         tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
-        let q = tree.range_query(&GridRegion(0,0,2,2)).collect::<Vec<&RegionItem>>();
+        let q = tree.range_query(&GridRegion(0, 0, 2, 2))
+            .collect::<Vec<&RegionItem>>();
         assert_eq!(2, q.len());
-        let q = tree.range_query(&GridRegion(0,0,1,1)).collect::<Vec<&RegionItem>>();
+        let q = tree.range_query(&GridRegion(0, 0, 1, 1))
+            .collect::<Vec<&RegionItem>>();
         assert_eq!(2, q.len());
     }
 
@@ -220,26 +212,38 @@ mod tests {
     pub fn ntree_tests() {
         let mut world = World::new();
 
-        use ntree::{Region, NTree};
-        let r = GridRegion(0,0,128,128);
+        use ntree::{NTree, Region};
+        let r = GridRegion(0, 0, 128, 128);
         let gizero = RegionItem::new(0, 0, world.create_entity().build());
         assert_eq!(true, r.contains(&gizero));
-        assert_eq!(false, r.contains(&RegionItem::new(128, 128, world.create_entity().build())));
+        assert_eq!(
+            false,
+            r.contains(&RegionItem::new(128, 128, world.create_entity().build()))
+        );
         let mut tree = NTree::<GridRegion, RegionItem>::new(r, 8);
         assert_eq!(true, tree.contains(&gizero));
-        assert_eq!(true, tree.contains(&RegionItem::new(32, 0, world.create_entity().build())));
+        assert_eq!(
+            true,
+            tree.contains(&RegionItem::new(32, 0, world.create_entity().build()))
+        );
         tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
         tree.insert(RegionItem::new(32, 0, world.create_entity().build()));
         assert_eq!(true, tree.contains(&gizero));
-        assert_eq!(true, tree.contains(&RegionItem::new(32, 0, world.create_entity().build())));
+        assert_eq!(
+            true,
+            tree.contains(&RegionItem::new(32, 0, world.create_entity().build()))
+        );
 
-        let q = tree.range_query(&GridRegion(0,0,2,2)).collect::<Vec<&RegionItem>>();
+        let q = tree.range_query(&GridRegion(0, 0, 2, 2))
+            .collect::<Vec<&RegionItem>>();
         assert_eq!(1, q.len());
-        
-        let q = tree.range_query(&GridRegion(1,1,2,2)).collect::<Vec<&RegionItem>>();
+
+        let q = tree.range_query(&GridRegion(1, 1, 2, 2))
+            .collect::<Vec<&RegionItem>>();
         assert_eq!(0, q.len());
-        
-        let q = tree.range_query(&GridRegion(0,0,33,33)).collect::<Vec<&RegionItem>>();
+
+        let q = tree.range_query(&GridRegion(0, 0, 33, 33))
+            .collect::<Vec<&RegionItem>>();
         assert_eq!(2, q.len());
     }
 }
@@ -253,7 +257,7 @@ mod tests {
 //                 vel.dx += 1;
 //             });
 //         });
-//     } 
+//     }
 //     #[bench]
 //     pub fn bench_vec_mutptr(b: &mut Bencher) {
 //         let mut vels: Vec<GridVelocity> = (0..1000*1000).map(|i| { GridVelocity::new() }).collect();
@@ -266,7 +270,7 @@ mod tests {
 //                 }
 //             };
 //         });
-//     } 
+//     }
 //     #[bench]
 //     pub fn bench_vec_par_mutptr(b: &mut Bencher) {
 //         let mut vels: Vec<GridVelocity> = (0..1000*1000).map(|i| { GridVelocity::new() }).collect();
@@ -279,7 +283,7 @@ mod tests {
 //                 }
 //             };
 //         });
-//     } 
+//     }
 
 //     #[bench]
 //     pub fn bench_vec_for(b: &mut Bencher) {
@@ -290,7 +294,7 @@ mod tests {
 //                 vel.dx += 1;
 //             };
 //         });
-//     } 
+//     }
 
 //     #[bench]
 //     pub fn bench_vec_par(b: &mut Bencher) {
@@ -302,8 +306,8 @@ mod tests {
 //                 vel.dx += 1;
 //             });
 //         });
-//     } 
-    
+//     }
+
 //     #[bench]
 //     pub fn bench_storage(b: &mut Bencher) {
 //         let mut world = setup_world();
@@ -317,8 +321,8 @@ mod tests {
 //             vel.dx += 1;
 //         }
 //         });
-//     }    
-    
+//     }
+
 //     #[bench]
 //     pub fn bench_vecstorage(b: &mut Bencher) {
 //         use std::default::Default;
@@ -337,8 +341,8 @@ mod tests {
 //             vel.dx += 1;
 //         }
 //         });
-//     }  
-    
+//     }
+
 //     #[bench]
 //     pub fn bench_storage_entity_prefetch(b: &mut Bencher) {
 //         use specs::prelude::Entity;
@@ -353,7 +357,7 @@ mod tests {
 //             vel.dx += 1;
 //         }
 //         });
-//     }   
+//     }
 
 //     #[bench]
 //     pub fn bench_storage_par(b: &mut Bencher) {
@@ -380,7 +384,7 @@ mod tests {
 //         let mut world = World::new();
 //         factory::init(&mut world);
 //         world.add_resource(Grid::new());
-        
+
 //        for j in 0..1000 {
 //            for i in 0..250 {
 //                 for d in 0..4 {
@@ -400,7 +404,7 @@ mod tests {
 //     #[bench]
 //     pub fn bench(b: &mut Bencher) {
 //         let mut world = setup_world();
-        
+
 //         grid_system::System::new().run_now(&mut world.res);
 
 //         let mut dispatcher = DispatcherBuilder::new();
@@ -417,7 +421,7 @@ mod tests {
 //         #[bench]
 //     pub fn bench_updatepos(b: &mut Bencher) {
 //         let mut world = setup_world();
-        
+
 //         grid_system::System::new().run_now(&mut world.res);
 
 //         let mut dispatcher = DispatcherBuilder::new();

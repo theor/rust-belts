@@ -8,41 +8,40 @@ pub struct System;
 
 impl System {
     pub fn new() -> Self {
-        System {
-        }
+        System {}
     }
 }
 
 impl<'a> specs::prelude::System<'a> for System {
-    type SystemData = (ReadStorage<'a, Belt>,
-                       WriteStorage<'a, GridItem>,
-                       WriteStorage<'a, Position>);
-                       
+    type SystemData = (
+        ReadStorage<'a, Belt>,
+        WriteStorage<'a, GridItem>,
+        WriteStorage<'a, Position>,
+    );
+
     fn run(&mut self, (belts, mut grid, mut pos): Self::SystemData) {
         use rayon::prelude::*;
-         (&belts).par_join().for_each(|belt| {
+        (&belts).par_join().for_each(|belt| {
             for item_id in belt.items.iter() {
                 unsafe {
-                    // if let None = belts.get(*item_id) { 
-                        // println!("move {:?} on {:?}", item_id, belt);
-                        let ppos = pos.get(*item_id).unwrap() as *const Position;
-                        let ppos = ppos as *mut Position;
+                    // if let None = belts.get(*item_id) {
+                    // println!("move {:?} on {:?}", item_id, belt);
+                    let ppos = pos.get(*item_id).unwrap() as *const Position;
+                    let ppos = ppos as *mut Position;
 
-                        
-                        let pgrid = grid.get(*item_id).unwrap() as *const GridItem;
-                        let pgrid = pgrid as *mut GridItem;
-                        (*pgrid).move_delta(10, 0);
-                        let (px,py) = (*pgrid).compute_position();
-                        (*ppos).x = px;
-                        (*ppos).y = py;
+                    let pgrid = grid.get(*item_id).unwrap() as *const GridItem;
+                    let pgrid = pgrid as *mut GridItem;
+                    (*pgrid).move_delta(10, 0);
+                    let (px, py) = (*pgrid).compute_position();
+                    (*ppos).x = px;
+                    (*ppos).y = py;
                     // }
                 }
 
-                
                 // match vel.get(*item_id) {
                 //     Some (vel) => {
                 //         let pvel = vel as *const GridVelocity;
-                //         unsafe { 
+                //         unsafe {
                 //             let mpvel = pvel as *mut GridVelocity;
                 //             (*mpvel).dx = 10;
                 //         }
@@ -50,7 +49,7 @@ impl<'a> specs::prelude::System<'a> for System {
                 //     None => (),
                 // }
             }
-         });
+        });
     }
 }
 // impl<'a> specs::prelude::System<'a> for System {
@@ -79,7 +78,6 @@ impl<'a> specs::prelude::System<'a> for System {
 //         //     }
 //         // });
 
-        
 //         // // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
 //         // for belt in (&belt).join() {
 //         //     for item_id in belt.items.iter() {
@@ -87,14 +85,14 @@ impl<'a> specs::prelude::System<'a> for System {
 //         //         vel.dx = 10;
 //         //     }
 //         //  }//);
-        
+
 //         // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
 //         (&belt).par_join().for_each(|belt| {
 //             for item_id in belt.items.iter() {
 //                 match vel.get(*item_id) {
 //                     Some (vel) => {
 //                         let pvel = vel as *const GridVelocity;
-//                         unsafe { 
+//                         unsafe {
 //                             let mpvel = pvel as *mut GridVelocity;
 //                             (*mpvel).dx = 10;
 //                         }
@@ -105,7 +103,7 @@ impl<'a> specs::prelude::System<'a> for System {
 //          });
 
 //         // let mut vr = vel.par_restrict_mut();
-        
+
 //         // (&belt, &grid).par_join().for_each(|(belt, belt_grid)| {
 //         // for (_belt, belt_grid) in (&belt, &grid).join() {
 //         //     let m = (*gridq).0.read().unwrap();
@@ -117,7 +115,7 @@ impl<'a> specs::prelude::System<'a> for System {
 //         //         for (e,(v,mut s)) in (&items, &mut vr).join() {
 //         //             let vel = s.get_mut_unchecked(&v);
 //         //             vel.dx = 10;
-                    
+
 //         //         }
 //         //     }
 //         // });

@@ -13,22 +13,16 @@ pub struct FPS(pub usize);
 #[storage(VecStorage)]
 pub struct Position {
     pub x: f32,
-    pub y: f32
+    pub y: f32,
 }
 
 impl Position {
     pub fn new() -> Self {
-        Position {
-            x: 0.0,
-            y: 0.0,
-        }
+        Position { x: 0.0, y: 0.0 }
     }
 
-    pub fn at(x: f32, y:f32) -> Self {
-        Position {
-            x: x,
-            y: y,
-        }
+    pub fn at(x: f32, y: f32) -> Self {
+        Position { x: x, y: y }
     }
 }
 
@@ -42,11 +36,13 @@ pub struct RegionItem {
 }
 
 impl RegionItem {
-    pub fn new(ix: u32, iy: u32, e: Entity) -> Self { RegionItem {ix, iy, e} }
+    pub fn new(ix: u32, iy: u32, e: Entity) -> Self {
+        RegionItem { ix, iy, e }
+    }
 }
 
 impl Region<RegionItem> for GridRegion {
- /// Does this region contain this point?
+    /// Does this region contain this point?
     fn contains(&self, i: &RegionItem) -> bool {
         i.ix >= self.0 && i.iy >= self.1 && i.ix < self.2 && i.iy < self.3
     }
@@ -82,7 +78,7 @@ impl Region<RegionItem> for GridRegion {
 pub struct GridItem {
     pub ix: u32,
     pub iy: u32,
-    
+
     pub dx: u8,
     pub dy: u8,
 }
@@ -96,7 +92,7 @@ impl GridItem {
             dy: 0u8,
         }
     }
-    
+
     pub fn new_subpos(x: u32, y: u32, dx: u8, dy: u8) -> Self {
         GridItem {
             ix: x,
@@ -123,9 +119,11 @@ impl GridItem {
         }
     }
 
-    pub fn compute_position(&self) -> (f32,f32) {
-        ((self.ix as f32 + self.dx as f32 / 255.0) * 32f32,
-         (self.iy as f32 + self.dy as f32 / 255.0) * 32f32)
+    pub fn compute_position(&self) -> (f32, f32) {
+        (
+            (self.ix as f32 + self.dx as f32 / 255.0) * 32f32,
+            (self.iy as f32 + self.dy as f32 / 255.0) * 32f32,
+        )
     }
 }
 
@@ -149,13 +147,16 @@ pub struct Belt {
 }
 
 impl Belt {
-    pub fn new() -> Self { Belt { items: Vec::with_capacity(8) } }
+    pub fn new() -> Self {
+        Belt {
+            items: Vec::with_capacity(8),
+        }
+    }
 }
 
 #[derive(Component, Debug)]
 #[storage(DenseVecStorage)]
-pub struct Item {
-}
+pub struct Item {}
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
@@ -165,22 +166,20 @@ pub enum Renderer {
 }
 
 impl Renderer {
-    pub fn sprite(sheet: usize, rect: (u8,u8)) -> Self {
+    pub fn sprite(sheet: usize, rect: (u8, u8)) -> Self {
         Renderer::SpriteSheet(Sprite {
             sheet: sheet,
             rect: rect,
         })
     }
-    pub fn shape(rect: (u8,u8)) -> Self {
-        Renderer::Shape(Shape {
-            rect: rect,
-        })
+    pub fn shape(rect: (u8, u8)) -> Self {
+        Renderer::Shape(Shape { rect: rect })
     }
 }
 
 #[derive(Debug)]
 pub struct Shape {
-    pub rect: (u8,u8),
+    pub rect: (u8, u8),
     // pub x: f32,
     // pub y: f32
 }
@@ -188,7 +187,7 @@ pub struct Shape {
 #[derive(Debug)]
 pub struct Sprite {
     pub sheet: usize,
-    pub rect: (u8,u8),
+    pub rect: (u8, u8),
     // pub x: f32,
     // pub y: f32
 }
