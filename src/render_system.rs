@@ -42,18 +42,35 @@ impl<'a> System<'a> {
                 match renderer {
                     &Renderer::SpriteSheet(ref sprite) => {
                         let img = (*res).try_get(sprite.sheet);
-                        let pimage = Image::new()
-                            .src_rect([img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64])
-                            .rect([0.0, 0.0, sprite.rect.0 as f64, sprite.rect.1 as f64]);
-                        pimage.draw(
-                            &img.image,
-                            &context.draw_state,
-                            context
+                        let source_rectangle = [img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64];
+                        let rectangle = [0.0, 0.0, sprite.rect.0 as f64, sprite.rect.1 as f64];
+                        
+                        let transform = context
                                 .transform
                                 .trans(cam.0 as f64, cam.1 as f64)
-                                .trans(position.x as f64, position.y as f64),
-                            graphics,
+                                .trans(position.x as f64, position.y as f64);
+                        graphics.tri_list_uv(
+                            &context.draw_state,
+                            &[1.0; 4],
+                            &img.image,
+                            |f| f(
+                                &triangulation::rect_tri_list_xy(transform, rectangle),
+                                &triangulation::rect_tri_list_uv(&img.image, source_rectangle)
+                            )
+
                         );
+                        // let pimage = Image::new()
+                        //     .src_rect([img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64])
+                        //     .rect([0.0, 0.0, sprite.rect.0 as f64, sprite.rect.1 as f64]);
+                        // pimage.draw(
+                        //     &img.image,
+                        //     &context.draw_state,
+                        //     context
+                        //         .transform
+                        //         .trans(cam.0 as f64, cam.1 as f64)
+                        //         .trans(position.x as f64, position.y as f64),
+                        //     graphics,
+                        // );
                     }
                     &Renderer::Shape(ref shape) => {
             //             // ellipse(
