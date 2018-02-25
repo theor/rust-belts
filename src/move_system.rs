@@ -18,20 +18,24 @@ impl<'a> specs::prelude::System<'a> for System {
                        WriteStorage<'a, GridItem>,
                        WriteStorage<'a, Position>);
                        
-    fn run(&mut self, (belt, mut grid, mut pos): Self::SystemData) {
+    fn run(&mut self, (belts, mut grid, mut pos): Self::SystemData) {
         use rayon::prelude::*;
-         (&belt).par_join().for_each(|belt| {
+         (&belts).par_join().for_each(|belt| {
             for item_id in belt.items.iter() {
                 unsafe {
-                    let ppos = pos.get(*item_id).unwrap() as *const Position;
-                    let ppos = ppos as *mut Position;
+                    // if let None = belts.get(*item_id) { 
+                        // println!("move {:?} on {:?}", item_id, belt);
+                        let ppos = pos.get(*item_id).unwrap() as *const Position;
+                        let ppos = ppos as *mut Position;
 
-                    
-                    let pgrid = grid.get(*item_id).unwrap() as *const GridItem;
-                    let pgrid = pgrid as *mut GridItem;
-                    (*pgrid).move_delta(10, 0);
-                    (*ppos).x = ((*pgrid).ix as f32 + (*pgrid).dx as f32 / 255.0) * 32f32;
-                    (*ppos).y = ((*pgrid).iy as f32 + (*pgrid).dy as f32 / 255.0) * 32f32;
+                        
+                        let pgrid = grid.get(*item_id).unwrap() as *const GridItem;
+                        let pgrid = pgrid as *mut GridItem;
+                        (*pgrid).move_delta(10, 0);
+                        let (px,py) = (*pgrid).compute_position();
+                        (*ppos).x = px;
+                        (*ppos).y = py;
+                    // }
                 }
 
                 

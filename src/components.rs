@@ -8,13 +8,6 @@ use ntree::Region;
 pub struct DeltaTime(pub f32);
 pub struct Camera(pub f32, pub f32);
 pub struct FPS(pub usize);
-pub struct Grid(pub Arc<RwLock<HashMap<(u32,u32), Vec<Index>>>>);
-
-impl Grid {
-    pub fn new() -> Self {
-        Grid(Arc::new(RwLock::new(HashMap::new())))
-    }
-}
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
@@ -28,6 +21,13 @@ impl Position {
         Position {
             x: 0.0,
             y: 0.0,
+        }
+    }
+
+    pub fn at(x: f32, y:f32) -> Self {
+        Position {
+            x: x,
+            y: y,
         }
     }
 }
@@ -121,6 +121,11 @@ impl GridItem {
         } else {
 
         }
+    }
+
+    pub fn compute_position(&self) -> (f32,f32) {
+        ((self.ix as f32 + self.dx as f32 / 255.0) * 32f32,
+         (self.iy as f32 + self.dy as f32 / 255.0) * 32f32)
     }
 }
 

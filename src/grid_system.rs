@@ -19,13 +19,12 @@ impl System {
 
 impl<'a> specs::prelude::System<'a> for System {
     type SystemData = (Fetch<'a, DeltaTime>,
-                       FetchMut<'a, Grid>,
                        Entities<'a>,
                        WriteStorage<'a, Belt>,
                        ReadStorage<'a, Item>,
                        ReadStorage<'a, GridItem>);
 
-    fn run(&mut self, (_delta, grid, entities, mut belt, item, grid_item): Self::SystemData) {
+    fn run(&mut self, (_delta, entities, mut belt, item, grid_item): Self::SystemData) {
         use rayon::prelude::*;
 
         // belts -> items
@@ -43,23 +42,19 @@ impl<'a> specs::prelude::System<'a> for System {
         // });
 
         (&*entities, &grid_item).join().for_each(|(belt_entity, belt_grid)| {
+            // println!("insert {:?} at {:?}", belt_entity, belt_grid);
             self.0.insert(RegionItem::new(belt_grid.ix, belt_grid.iy, belt_entity));
         });
-        // items -> par belts
-        // (&grid, &item).par_join().for_each(|(item_grid, _item)| {
         (&*entities, &mut belt, &grid_item).par_join().for_each(|(belt_entity, belt, belt_grid)| {
             let r = GridRegion(belt_grid.ix,belt_grid.iy,belt_grid.ix+1,belt_grid.iy+1);
             let q = self.0.range_query(&r);
             belt.items.clear();   
             for qi in q {
-                belt.items.push(qi.e);
+                if qi.e != belt_entity {
+                    println!("push {:?} in {:?}", qi.e, belt_entity);
+                    belt.items.push(qi.e);
+                }
             }
-            // for (item_grid, _item, e) in (&grid_item, &item, &*entities).join() {
-            //     if item_grid.ix == belt_grid.ix &&
-            //        item_grid.iy == belt_grid.iy {
-            //         belt.items.push(e)
-            //     }
-            // }
         });
     }
 }
