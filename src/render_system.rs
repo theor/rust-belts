@@ -36,7 +36,38 @@ impl<'a> System<'a> {
             // http://docs.piston.rs/mush/src/opengl_graphics/back_end.rs.html#379
             use std::iter::Iterator;
             let mut iter = (&pos, &renderer).join();
-            while let Some((position, renderer)) = iter.next() {
+
+            let img = (*res).try_get(0);
+            let source_rectangle = [img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64];
+            let uvs = &triangulation::rect_tri_list_uv(&img.image, source_rectangle);
+             graphics.tri_list_uv(
+                &context.draw_state,
+                &[1.0; 4],
+                &img.image,
+                |f| {
+                    triangulation::stream_polygon_tri_list(context
+                        .transform
+                        .trans(cam.0 as f64, cam.1 as f64),
+                    || {
+                        if let Some((position, renderer)) = iter.next() {
+                            match renderer {
+                                &Renderer::SpriteSheet(ref sprite) => {
+                                    let img = (*res).try_get(sprite.sheet);
+                                    let source_rectangle = [img.offset.0 as f64, img.offset.1 as f64, img.size.0 as f64, img.size.1 as f64];
+                                    
+                                    None
+                                },
+                                _ => None,
+                            }
+                        } else {
+                            None
+                        }
+                    },
+                    |xy| {f(xy, uvs)})
+                }
+            );
+
+            if let Some((position, renderer)) = iter.next() {
                 
                 match renderer {
                     &Renderer::SpriteSheet(ref sprite) => {
@@ -46,16 +77,7 @@ impl<'a> System<'a> {
                                 .transform
                                 .trans(cam.0 as f64, cam.1 as f64)
                                 .trans(position.x as f64, position.y as f64);
-                        graphics.tri_list_uv(
-                            &context.draw_state,
-                            &[1.0; 4],
-                            &img.image,
-                            |f| {
-                                triangulation::stream_polygon_tri_list(transform,
-                                || { None },
-                                |xy| {f(xy, &triangulation::rect_tri_list_uv(&img.image, source_rectangle))})
-                            }
-                        );
+           
                     },
                     _ => (),
                 }
