@@ -62,7 +62,7 @@ impl<'a> specs::prelude::System<'a> for System {
                 belt.items.clear();
                 for qi in q {
                     if qi.e != belt_entity {
-                        println!("push {:?} in {:?}", qi.e, belt_entity);
+                        // println!("push {:?} in {:?}", qi.e, belt_entity);
                         belt.items.push(qi.e);
                     }
                 }

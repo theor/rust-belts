@@ -4,7 +4,8 @@ use resmgr::ResMgr;
 use components::*;
 
 use ggez::*;
-use ggez::graphics::{DrawMode, DrawParam, Point2, Rect};
+use ggez::graphics::spritebatch::*;
+use ggez::graphics::{DrawMode, DrawParam, Point2, Rect,};
 
 pub struct System<'a>(pub &'a mut Context); //gfx_graphics::back_end::GfxGraphics<'_, gfx_device_gl::Resources, gfx_device_gl::command::CommandBuffer>);
 
@@ -17,19 +18,22 @@ impl<'a> BaseSystem<'a> for System<'a> {
     );
 
     fn run(&mut self, (cam, res, pos, renderer): Self::SystemData) {
+        let mut batches = [None, None];
+        let ctx = &mut self.0;
+
         for (position, renderer) in (&pos, &renderer).join() {
             if position.x < 0.0 || position.y < 0.0 || position.x > 500.0 || position.y > 500.0 {
                 continue;
             }
-            let ctx = &mut self.0;
             match renderer {
                 &Renderer::SpriteSheet(ref sprite) => {
-                    // graphics::circle(self.0,
-                    //  DrawMode::Fill,
-                    //  Point2::new(position.x, position.y),
-                    //  20.0,
-                    //  2.0).unwrap();
                     let img = (*res).try_get(sprite.sheet);
+                    match batches[sprite.sheet] {
+                        Some (_) => {},
+                        None => { batches[sprite.sheet] = Some(SpriteBatch::new(img.image.clone())); },
+                    };
+
+                    let mut batch: &mut SpriteBatch =  &mut batches[sprite.sheet].as_mut().unwrap();
                     let source_rectangle = Rect::new(
                         img.offset.0 as f32,
                         img.offset.1 as f32,
@@ -40,15 +44,17 @@ impl<'a> BaseSystem<'a> for System<'a> {
                     // println!("src {:?} dst {:?} pos {:?}", source_rectangle, rectangle, position);
                     let dest = Point2::new(position.x, position.y);
                     // let dest = Point2::new(0.0,0.0);
-                    graphics::draw_ex(
-                        ctx,
-                        &img.image,
-                        DrawParam {
-                            src: source_rectangle,
-                            dest: dest,
-                            ..Default::default()
-                        },
-                    ).unwrap();
+                    let draw_params = DrawParam {
+                        src: source_rectangle,
+                        dest: dest,
+                        ..Default::default()
+                    };
+                    batch.add(draw_params);
+                    // graphics::draw_ex(
+                    //     ctx,
+                    //     &img.image,
+                    //     draw_params,
+                    // ).unwrap();
                     // let transform = context
                     //         .transform
                     //         .trans(cam.0 as f64, cam.1 as f64)
@@ -78,6 +84,15 @@ impl<'a> BaseSystem<'a> for System<'a> {
             }
 
             // //     // println!("Hello, {:?}", &position);
+        }
+
+        for batch in batches.iter() {
+            use ggez::graphics::Drawable;
+
+            match batch {
+                &Some(ref b) => b.draw_ex(ctx, Default::default()).unwrap(), 
+                _ => {},
+            }
         }
     }
 }
