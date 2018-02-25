@@ -56,7 +56,7 @@ fn main() {
 
     let mut dispatcher = DispatcherBuilder::new();
         dispatcher.add(move_system::System::new(), "move", &[]);
-        dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
+        // dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
     let mut dispatcher = dispatcher.build();
 
     let mut window: PistonWindow = WindowSettings::new("Hello Piston!", [640, 480])
@@ -311,6 +311,23 @@ mod tests {
 
         b.iter(||{
             move_system::System::new().run_now(&mut world.res);
+            // dispatcher.dispatch(&mut world.res);
+        });
+    }
+
+        #[bench]
+    pub fn bench_updatepos(b: &mut Bencher) {
+        let mut world = setup_world();
+        
+        grid_system::System::new().run_now(&mut world.res);
+
+        let mut dispatcher = DispatcherBuilder::new();
+        dispatcher.add(move_system::System::new(), "move", &[]);
+        dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
+        let mut dispatcher = dispatcher.build();
+
+        b.iter(||{
+            update_pos_system::System::new().run_now(&mut world.res);
             // dispatcher.dispatch(&mut world.res);
         });
     }

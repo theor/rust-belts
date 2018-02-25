@@ -22,3 +22,6 @@ test tests::bench_vec_par                 ... bench:     186,679 ns/iter (+/- 16
 test tests::bench_vec_par_mutptr          ... bench:     693,501 ns/iter (+/- 664,682)
 test tests::bench_storage_entity_prefetch ... bench:   6,972,238 ns/iter (+/- 5,391,489)
 test tests::bench_vecstorage              ... bench:     534,806 ns/iter (+/- 112,133)
+
+test tests::bench_updatepos               ... bench:   7,336,810 ns/iter (+/- 497,312) // two loops
+test tests::bench_updatepos               ... bench:   5,336,810 ns/iter (+/- 497,312) // one loop
