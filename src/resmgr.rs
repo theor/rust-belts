@@ -5,7 +5,7 @@ use piston_window::{G2dTexture, GfxFactory, Texture, TextureSettings, Flip};
 
 pub struct ResMgr {
     pub assets_path: std::path::PathBuf,
-    assets: HashMap<&'static str, Sheet>,
+    assets: Vec<Sheet>,
 }
 
 pub struct Sheet {
@@ -23,7 +23,7 @@ impl ResMgr {
         println!("{:?}", assets);
         ResMgr {
             assets_path: assets,
-            assets: HashMap::new(),
+            assets: Vec::new(),
         }
     }
 
@@ -39,10 +39,10 @@ impl ResMgr {
                 Flip::None,
                 &TextureSettings::new()
             ).unwrap();
-        self.assets.insert(path, Sheet {image: belt_image, stride: stride, size: size, offset: offset});
+        self.assets.push(Sheet {image: belt_image, stride: stride, size: size, offset: offset});
     }
 
-    pub fn try_get(&self, name: &'static str) -> Option<&Sheet> {
-        self.assets.get(name)
+    pub fn try_get(&self, idx: usize) -> &Sheet {
+        &self.assets[idx]
     }
 }
