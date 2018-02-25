@@ -35,10 +35,10 @@ impl<'a> System<'a> {
             // http://docs.piston.rs/mush/src/graphics/image.rs.html#99
             // http://docs.piston.rs/mush/src/opengl_graphics/back_end.rs.html#379
 
-            // for (position, renderer) in (&pos, &renderer).join() {
-            //     if position.x < 0.0 || position.y < 0.0 || position.x > 500.0 || position.y > 500.0 {
-            //         continue;
-            //     }
+            for (position, renderer) in (&pos, &renderer).join() {
+                if position.x < 0.0 || position.y < 0.0 || position.x > 500.0 || position.y > 500.0 {
+                    continue;
+                }
             //     match renderer {
             //         &Renderer::SpriteSheet(ref sprite) => {
             //             let img = (*res).try_get(sprite.sheet).unwrap();
@@ -69,7 +69,7 @@ impl<'a> System<'a> {
             //     }
 
             //     // println!("Hello, {:?}", &position);
-            // }
+            }
             
            
             let fps = fps.0;
