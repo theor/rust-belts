@@ -166,10 +166,11 @@ pub enum Renderer {
 }
 
 impl Renderer {
-    pub fn sprite(sheet: usize, rect: (u8, u8)) -> Self {
+    pub fn sprite(sheet: usize, rect: (u8, u8), scale: (f32, f32),) -> Self {
         Renderer::SpriteSheet(Sprite {
-            sheet: sheet,
-            rect: rect,
+            sheet,
+            rect,
+            scale,
         })
     }
     pub fn shape(rect: (u8, u8)) -> Self {
@@ -188,6 +189,7 @@ pub struct Shape {
 pub struct Sprite {
     pub sheet: usize,
     pub rect: (u8, u8),
+    pub scale: (f32, f32),
     // pub x: f32,
     // pub y: f32
 }

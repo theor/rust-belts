@@ -47,6 +47,7 @@ impl<'a> BaseSystem<'a> for System<'a> {
                     let draw_params = DrawParam {
                         src: source_rectangle,
                         dest: dest,
+                        scale: Point2::new(sprite.scale.0, sprite.scale.1),
                         ..Default::default()
                     };
                     batch.add(draw_params);

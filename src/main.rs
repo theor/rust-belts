@@ -63,17 +63,16 @@ impl MainState {
         world.add_resource(mgr);
 
         for i in 0..1000 {
-        for j in 0..100 {
-            factory::belt(&mut world, i, j);
-        } }
-
-        for i in 0..1000 {
-        for j in 0..250 {
-            for d in 0..4 {
-                factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
-                factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
+            for j in 0..100 {
+                factory::belt(&mut world, i, j);
             }
-        }}
+            for j in 0..250 {
+                for d in 0..4 {
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4), 16);
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4), 112);
+                }
+            }
+        }
 
         let mut dispatcher = DispatcherBuilder::new();
         dispatcher.add(move_system::System::new(), "move", &[]);
