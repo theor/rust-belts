@@ -62,13 +62,13 @@ impl MainState {
         }
         world.add_resource(mgr);
 
-        for i in 0..100 {
+        for i in 0..1000 {
         for j in 0..100 {
             factory::belt(&mut world, i, j);
         } }
 
-        for i in 0..100 {
-        for j in 0..100 {
+        for i in 0..1000 {
+        for j in 0..250 {
             for d in 0..4 {
                 factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
                 factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
@@ -113,7 +113,7 @@ impl event::EventHandler for MainState {
         graphics::draw(ctx, &self.text, dest_point, 0.0)?;
         graphics::present(ctx);
         self.frames += 1;
-        if (self.frames % 100) == 0 {
+        if (self.frames % 60) == 0 {
             println!("FPS: {}", ggez::timer::get_fps(ctx));
         }
         Ok(())
@@ -252,7 +252,6 @@ mod tests {
             .collect::<Vec<&RegionItem>>();
         assert_eq!(2, q.len());
     }
-}
 
 //     #[bench]
 //     pub fn bench_vec(b: &mut Bencher) {
@@ -386,43 +385,42 @@ mod tests {
 //         });
 //     }
 
-//     fn setup_world() -> World {
-//         let mut world = World::new();
-//         factory::init(&mut world);
-//         world.add_resource(Grid::new());
+    fn setup_world() -> World {
+        let mut world = World::new();
+        factory::init(&mut world);
 
-//        for j in 0..1000 {
-//            for i in 0..250 {
-//                 for d in 0..4 {
-//                     factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
-//                     factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
-//                 }
-//             }
-//        }
-//        for j in 0..100 {
-//             for i in 0..100 {
-//                 factory::belt(&mut world, i, j);
-//             }
-//         }
-//         world
-//     }
+       for j in 0..1000 {
+           for i in 0..250 {
+                for d in 0..4 {
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
+                }
+            }
+       }
+       for j in 0..1000 {
+            for i in 0..125 {
+                factory::belt(&mut world, i, j);
+            }
+        }
+        world
+    }
 
-//     #[bench]
-//     pub fn bench(b: &mut Bencher) {
-//         let mut world = setup_world();
+    #[bench]
+    pub fn bench(b: &mut Bencher) {
+        let mut world = setup_world();
 
-//         grid_system::System::new().run_now(&mut world.res);
+        grid_system::System::new().run_now(&mut world.res);
 
-//         let mut dispatcher = DispatcherBuilder::new();
-//         dispatcher.add(move_system::System::new(), "move", &[]);
-//         dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
-//         let mut dispatcher = dispatcher.build();
+        let mut dispatcher = DispatcherBuilder::new();
+        dispatcher.add(move_system::System::new(), "move", &[]);
+        let mut dispatcher = dispatcher.build();
 
-//         b.iter(||{
-//             move_system::System::new().run_now(&mut world.res);
-//             // dispatcher.dispatch(&mut world.res);
-//         });
-//     }
+        b.iter(||{
+            move_system::System::new().run_now(&mut world.res);
+            // dispatcher.dispatch(&mut world.res);
+        });
+    }
+}
 
 //         #[bench]
 //     pub fn bench_updatepos(b: &mut Bencher) {
@@ -432,7 +430,6 @@ mod tests {
 
 //         let mut dispatcher = DispatcherBuilder::new();
 //         dispatcher.add(move_system::System::new(), "move", &[]);
-//         dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
 //         let mut dispatcher = dispatcher.build();
 
 //         b.iter(||{
