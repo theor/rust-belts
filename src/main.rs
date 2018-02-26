@@ -63,25 +63,25 @@ impl MainState {
 
         use components::Direction::*;
 
-        for &(x,y, ref d) in [(0,0,Right), (1,0, Down), (1,1, Down), (1,2, Down),
-                       (1,3, Right), (2,3, Right), (3,3, Down), (3,4, Down)].into_iter() {
-            factory::belt(&mut world, x, y, d.clone());
+        // for &(x,y, ref d) in [(0,0,Right), (1,0, Down), (1,1, Down), (1,2, Down),
+        //                (1,3, Right), (2,3, Right), (3,3, Up), (3,2, Up), (3,1, Up)].into_iter() {
+        //     factory::belt(&mut world, x, y, d.clone());
 
-        }
-
-        factory::item_subpos(&mut world, 0, 0, 0, 16);
-        factory::item_subpos(&mut world, 0, 1, 0, 96);
-        // for i in 0..1000 {
-        //     for j in 0..100 {
-        //         factory::belt(&mut world, i, j);
-        //     }
-        //     for j in 0..250 {
-        //         for d in 0..4 {
-        //             factory::item_subpos(&mut world, i, j, d * (255 / 4), 16);
-        //             factory::item_subpos(&mut world, i, j, d * (255 / 4), 112);
-        //         }
-        //     }
         // }
+
+        // factory::item_subpos(&mut world, 0, 0, 0, 16);
+        // factory::item_subpos(&mut world, 0, 1, 0, 96);
+        for i in 0..1000 {
+            for j in 0..100 {
+                factory::belt(&mut world, i, j, Right);
+            }
+            for j in 0..250 {
+                for d in 0..4 {
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4), 16);
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4), 112);
+                }
+            }
+        }
 
         let mut dispatcher = DispatcherBuilder::new();
         dispatcher.add(move_system::System::new(), "move", &[]);
@@ -194,72 +194,91 @@ mod tests {
     use super::*;
     use super::components::*;
     use test::Bencher;
-
     #[test]
-    pub fn ntree_tests2() {
-        let mut world = World::new();
-        factory::init(&mut world);
-        for i in 0..10 {
-            factory::belt(&mut world, i, 0);
-        }
-        factory::belt(&mut world, 0, 1);
-        factory::item_subpos(&mut world, 1, 0, 0, 0);
-        factory::item_subpos(&mut world, 0, 0, 0, 0);
+    pub fn grid_sub() {
+        let mut g = GridItem::new(1,1);
+        g.move_delta(-1,0);
+        assert_eq!(0, g.ix);
+        assert_eq!(1, g.iy);
+        assert_eq!(255, g.dx);
+        assert_eq!(0, g.dy);
     }
+	
     #[test]
-    pub fn ntree_tests3() {
-        let mut world = World::new();
-        use ntree::{NTree, Region};
-        let r = GridRegion(0, 0, 128, 128);
-        let mut tree = NTree::<GridRegion, RegionItem>::new(r, 8);
-        tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
-        tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
-        let q = tree.range_query(&GridRegion(0, 0, 2, 2))
-            .collect::<Vec<&RegionItem>>();
-        assert_eq!(2, q.len());
-        let q = tree.range_query(&GridRegion(0, 0, 1, 1))
-            .collect::<Vec<&RegionItem>>();
-        assert_eq!(2, q.len());
+    pub fn grid_sub_d() {
+        let mut g = GridItem::new_subpos(1,1, 50, 30);
+        g.move_delta(-1,0);
+        assert_eq!(1, g.ix);
+        assert_eq!(1, g.iy);
+        assert_eq!(49, g.dx);
+        assert_eq!(30, g.dy);
     }
 
-    #[test]
-    pub fn ntree_tests() {
-        let mut world = World::new();
+    // #[test]
+    // pub fn ntree_tests2() {
+    //     let mut world = World::new();
+    //     factory::init(&mut world);
+    //     for i in 0..10 {
+    //         factory::belt(&mut world, i, 0);
+    //     }
+    //     factory::belt(&mut world, 0, 1);
+    //     factory::item_subpos(&mut world, 1, 0, 0, 0);
+    //     factory::item_subpos(&mut world, 0, 0, 0, 0);
+    // }
+    // #[test]
+    // pub fn ntree_tests3() {
+    //     let mut world = World::new();
+    //     use ntree::{NTree, Region};
+    //     let r = GridRegion(0, 0, 128, 128);
+    //     let mut tree = NTree::<GridRegion, RegionItem>::new(r, 8);
+    //     tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
+    //     tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
+    //     let q = tree.range_query(&GridRegion(0, 0, 2, 2))
+    //         .collect::<Vec<&RegionItem>>();
+    //     assert_eq!(2, q.len());
+    //     let q = tree.range_query(&GridRegion(0, 0, 1, 1))
+    //         .collect::<Vec<&RegionItem>>();
+    //     assert_eq!(2, q.len());
+    // }
 
-        use ntree::{NTree, Region};
-        let r = GridRegion(0, 0, 128, 128);
-        let gizero = RegionItem::new(0, 0, world.create_entity().build());
-        assert_eq!(true, r.contains(&gizero));
-        assert_eq!(
-            false,
-            r.contains(&RegionItem::new(128, 128, world.create_entity().build()))
-        );
-        let mut tree = NTree::<GridRegion, RegionItem>::new(r, 8);
-        assert_eq!(true, tree.contains(&gizero));
-        assert_eq!(
-            true,
-            tree.contains(&RegionItem::new(32, 0, world.create_entity().build()))
-        );
-        tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
-        tree.insert(RegionItem::new(32, 0, world.create_entity().build()));
-        assert_eq!(true, tree.contains(&gizero));
-        assert_eq!(
-            true,
-            tree.contains(&RegionItem::new(32, 0, world.create_entity().build()))
-        );
+    // #[test]
+    // pub fn ntree_tests() {
+    //     let mut world = World::new();
 
-        let q = tree.range_query(&GridRegion(0, 0, 2, 2))
-            .collect::<Vec<&RegionItem>>();
-        assert_eq!(1, q.len());
+    //     use ntree::{NTree, Region};
+    //     let r = GridRegion(0, 0, 128, 128);
+    //     let gizero = RegionItem::new(0, 0, world.create_entity().build());
+    //     assert_eq!(true, r.contains(&gizero));
+    //     assert_eq!(
+    //         false,
+    //         r.contains(&RegionItem::new(128, 128, world.create_entity().build()))
+    //     );
+    //     let mut tree = NTree::<GridRegion, RegionItem>::new(r, 8);
+    //     assert_eq!(true, tree.contains(&gizero));
+    //     assert_eq!(
+    //         true,
+    //         tree.contains(&RegionItem::new(32, 0, world.create_entity().build()))
+    //     );
+    //     tree.insert(RegionItem::new(0, 0, world.create_entity().build()));
+    //     tree.insert(RegionItem::new(32, 0, world.create_entity().build()));
+    //     assert_eq!(true, tree.contains(&gizero));
+    //     assert_eq!(
+    //         true,
+    //         tree.contains(&RegionItem::new(32, 0, world.create_entity().build()))
+    //     );
 
-        let q = tree.range_query(&GridRegion(1, 1, 2, 2))
-            .collect::<Vec<&RegionItem>>();
-        assert_eq!(0, q.len());
+    //     let q = tree.range_query(&GridRegion(0, 0, 2, 2))
+    //         .collect::<Vec<&RegionItem>>();
+    //     assert_eq!(1, q.len());
 
-        let q = tree.range_query(&GridRegion(0, 0, 33, 33))
-            .collect::<Vec<&RegionItem>>();
-        assert_eq!(2, q.len());
-    }
+    //     let q = tree.range_query(&GridRegion(1, 1, 2, 2))
+    //         .collect::<Vec<&RegionItem>>();
+    //     assert_eq!(0, q.len());
+
+    //     let q = tree.range_query(&GridRegion(0, 0, 33, 33))
+    //         .collect::<Vec<&RegionItem>>();
+    //     assert_eq!(2, q.len());
+    // }
 
 //     #[bench]
 //     pub fn bench_vec(b: &mut Bencher) {
@@ -394,6 +413,7 @@ mod tests {
 //     }
 
     fn setup_world() -> World {
+        use components::*;
         let mut world = World::new();
         factory::init(&mut world);
 
@@ -407,7 +427,7 @@ mod tests {
        }
        for j in 0..1000 {
             for i in 0..125 {
-                factory::belt(&mut world, i, j);
+                factory::belt(&mut world, i, j, Direction::Right);
             }
         }
         world

@@ -104,28 +104,52 @@ impl GridItem {
     pub fn move_delta(&mut self, x: i16, y: i16) -> bool {
         let mut res = false;
         if x >= 0 {
-            let new_dx = self.dx as u32 + x as u32;
+            let new_dx = self.dx as u16 + x as u16;
             self.dx = (new_dx % 256) as u8;
-            self.ix += new_dx / 256;
-            res |= true;
+            let ax = new_dx as u32 / 256;
+            self.ix += ax;
+            res |= ax != 0;
         } else {
-            unimplemented!();
+            let new_dx = self.dx as i32 + x as i32;
+            if new_dx < 0 { 
+                self.dx = ((256 - (-new_dx as u32)) % 256) as u8;
+                let ax = ((256-new_dx) as u32) / 256;
+                self.ix -= ax;
+                res |= ax != 0;
+            } else {
+                self.dx = (new_dx as u32 % 256) as u8;
+                let ax = new_dx as u32 / 256;
+                self.ix += ax;
+                res |= ax != 0;
+            }
         }
         if y >= 0 {
             let new_dy = self.dy as u32 + y as u32;
             self.dy = (new_dy % 256) as u8;
-            self.iy += new_dy / 256;
-            res |= true;
+            let ay = new_dy as u32 / 256;
+            self.iy += ay;
+            res |= ay != 0;
         } else {
-            unimplemented!();
+            let new_dy = self.dy as i32 + y as i32;
+            if new_dy < 0 { 
+                self.dy = ((256 - (-new_dy as u32)) % 256) as u8;
+                let ay = ((256-new_dy) as u32) / 256;
+                self.iy -= ay;
+                res |= ay != 0;
+            } else {
+                self.dy = (new_dy as u32 % 256) as u8;
+                let ay = new_dy as u32 / 256;
+                self.iy += ay;
+                res |= ay != 0;
+            }
         }
         res
     }
 
     pub fn compute_position(&self) -> (f32, f32) {
         (
-            (self.ix as f32 + self.dx as f32 / 255.0) * 32f32,
-            (self.iy as f32 + self.dy as f32 / 255.0) * 32f32,
+            (self.ix as f32 + self.dx as f32 / 255.0) * 32f32 + 16.0,
+            (self.iy as f32 + self.dy as f32 / 255.0) * 32f32 + 16.0,
         )
     }
 }
@@ -170,11 +194,12 @@ pub enum Renderer {
 }
 
 impl Renderer {
-    pub fn sprite(sheet: usize, rect: (u8, u8), scale: (f32, f32),) -> Self {
+    pub fn sprite(sheet: usize, rect: (u8, u8), scale: (f32, f32), flip: Flip) -> Self {
         Renderer::SpriteSheet(Sprite {
             sheet,
             rect,
             scale,
+            flip,
         })
     }
     pub fn shape(rect: (u8, u8)) -> Self {
@@ -189,11 +214,14 @@ pub struct Shape {
     // pub y: f32
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum Flip { None, Horizontal, Vertical, Both, }
 #[derive(Debug)]
 pub struct Sprite {
     pub sheet: usize,
     pub rect: (u8, u8),
     pub scale: (f32, f32),
+    pub flip: Flip,
     // pub x: f32,
     // pub y: f32
 }

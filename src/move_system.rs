@@ -53,7 +53,8 @@ impl<'a> specs::prelude::System<'a> for System {
                         let (mx, my) = match &belt.0 {
                             &Direction::Right => (10,0),
                             &Direction::Down => (0,10),
-                            _ => (0,0),
+                            &Direction::Up => (0, -10),
+                            &Direction::Left => (-10, 0),
                         };
 
                         if (*pgrid).move_delta(mx, my) {

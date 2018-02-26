@@ -35,20 +35,26 @@ impl<'a> BaseSystem<'a> for System<'a> {
 
                     let mut batch: &mut SpriteBatch =  &mut batches[sprite.sheet].as_mut().unwrap();
                     let source_rectangle = Rect::new(
-                        (img.offset.0 + sprite.rect.0) as f32,
-                        img.offset.1 as f32,
+                        img.offset.0 + (sprite.rect.0 as f32 / img.dim.0 as f32),
+                        img.offset.1 + (sprite.rect.1 as f32 / img.dim.1 as f32),
                         img.size.0 as f32,
                         img.size.1 as f32,
                     );
                     // TODO use that instead of scale
                     // let rectangle = Rect::new(0.0, 0.0, sprite.rect.0 as f32, sprite.rect.1 as f32);
                     // println!("src {:?} dst {:?} pos {:?}", source_rectangle, rectangle, position);
+                    // use components::Flip::*;
+                    // let (px, py) = match sprite.flip {
+                    //     None => (position.x, position.y),
+                    //     Horizontal => (position.x, position.y),
+                    // }
                     let dest = Point2::new(position.x, position.y);
                     // let dest = Point2::new(0.0,0.0);
                     let draw_params = DrawParam {
                         src: source_rectangle,
                         dest: dest,
                         scale: Point2::new(sprite.scale.0, sprite.scale.1),
+                        offset: Point2::new(0.5, 0.5),
                         ..Default::default()
                     };
                     batch.add(draw_params);

@@ -10,6 +10,7 @@ pub struct Sheet {
     pub stride: u8,
     pub size: (f32, f32),
     pub offset: (f32, f32),
+    pub dim: (u32,u32)
 }
 
 impl ResMgr {
@@ -34,11 +35,13 @@ impl ResMgr {
             offset.0 as f32 / image.width() as f32,
             offset.1 / image.height() as f32,
         );
+        let dim = (image.width(), image.height());
         self.assets.push(Sheet {
             image,
             stride,
             size,
             offset,
+            dim,
         });
     }
 
