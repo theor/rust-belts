@@ -1,13 +1,12 @@
 use specs::prelude::*;
-use specs::world::Index;
-use std::collections::HashMap;
-use std::sync::RwLock;
-use std::sync::Arc;
 use ntree::Region;
 
 pub struct DeltaTime(pub f32);
 pub struct Camera(pub f32, pub f32);
-pub struct FPS(pub usize);
+
+use ntree::{NTree};
+pub type GridTree = NTree<GridRegion, RegionItem>;
+pub struct Grid(pub GridTree);
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
@@ -28,7 +27,7 @@ impl Position {
 
 #[derive(Debug, Clone)]
 pub struct GridRegion(pub u32, pub u32, pub u32, pub u32);
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RegionItem {
     pub ix: u32,
     pub iy: u32,
@@ -146,15 +145,11 @@ impl GridVelocity {
 
 #[derive(Component, Debug)]
 #[storage(DenseVecStorage)]
-pub struct Belt {
-    pub items: Vec<Entity>,
-}
+pub struct Belt;
 
 impl Belt {
     pub fn new() -> Self {
-        Belt {
-            items: Vec::with_capacity(8),
-        }
+        Belt {}
     }
 }
 

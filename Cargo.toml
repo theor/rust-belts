@@ -12,7 +12,10 @@ find_folder = "*"
 # image = "*"
 flame = "*"
 hibitset = "*"
-ntree = "*"
+crossbeam = "*"
+
+[dependencies.ntree]
+git = "https://github.com/theor/rust-n-tree.git"
 
 [dependencies.ggez]
 git = "https://github.com/ggez/ggez.git"

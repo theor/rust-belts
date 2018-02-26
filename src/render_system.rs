@@ -5,7 +5,7 @@ use components::*;
 
 use ggez::*;
 use ggez::graphics::spritebatch::*;
-use ggez::graphics::{DrawMode, DrawParam, Point2, Rect,};
+use ggez::graphics::{DrawParam, Point2, Rect,};
 
 pub struct System<'a>(pub &'a mut Context); //gfx_graphics::back_end::GfxGraphics<'_, gfx_device_gl::Resources, gfx_device_gl::command::CommandBuffer>);
 
@@ -17,7 +17,7 @@ impl<'a> BaseSystem<'a> for System<'a> {
         ReadStorage<'a, Renderer>,
     );
 
-    fn run(&mut self, (cam, res, pos, renderer): Self::SystemData) {
+    fn run(&mut self, (_cam, res, pos, renderer): Self::SystemData) {
         let mut batches = [None, None];
         let ctx = &mut self.0;
 
@@ -40,7 +40,8 @@ impl<'a> BaseSystem<'a> for System<'a> {
                         img.size.0 as f32,
                         img.size.1 as f32,
                     );
-                    let rectangle = Rect::new(0.0, 0.0, sprite.rect.0 as f32, sprite.rect.1 as f32);
+                    // TODO use that instead of scale
+                    // let rectangle = Rect::new(0.0, 0.0, sprite.rect.0 as f32, sprite.rect.1 as f32);
                     // println!("src {:?} dst {:?} pos {:?}", source_rectangle, rectangle, position);
                     let dest = Point2::new(position.x, position.y);
                     // let dest = Point2::new(0.0,0.0);
@@ -71,7 +72,7 @@ impl<'a> BaseSystem<'a> for System<'a> {
 
                     // );
                 }
-                &Renderer::Shape(ref shape) => {
+                &Renderer::Shape(ref _shape) => {
                     //             // ellipse(
                     //             //     [1.0, 0.0, 0.0, 1.0],
                     //             //     [0.0, 0.0, shape.rect.0 as f64, shape.rect.1 as f64],

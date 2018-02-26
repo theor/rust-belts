@@ -1,7 +1,5 @@
-use std;
 use ggez::Context;
 use ggez::graphics::Image;
-use find_folder;
 
 pub struct ResMgr {
     assets: Vec<Sheet>,

@@ -11,6 +11,7 @@ pub fn init(world: &mut World) {
 
     world.add_resource(DeltaTime(0f32));
     world.add_resource(Camera(0f32, 0f32));
+    world.add_resource(Grid(GridTree::new(GridRegion(0,0,1024,1024), 9)));
 }
 
 pub fn belt(world: &mut World, x: u32, y: u32) -> Entity {

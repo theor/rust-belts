@@ -5,6 +5,7 @@ extern crate flame;
 extern crate ntree;
 extern crate rayon;
 extern crate specs;
+extern crate crossbeam;
 
 extern crate ggez;
 
@@ -18,7 +19,6 @@ extern crate test;
 mod components;
 mod render_system;
 mod move_system;
-mod update_pos_system;
 mod grid_system;
 mod resmgr;
 mod factory;
@@ -32,7 +32,6 @@ use std::env;
 use std::path;
 
 use specs::prelude::{Dispatcher, DispatcherBuilder, RunNow, World};
-use components::{DeltaTime, FPS};
 
 // First we make a structure to contain the game's state
 struct MainState {
@@ -80,7 +79,7 @@ impl MainState {
         let mut dispatcher = DispatcherBuilder::new();
         dispatcher.add(move_system::System::new(), "move", &[]);
         // dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
-        let mut dispatcher = dispatcher.build();
+        let dispatcher = dispatcher.build();
 
         println!("Grid System");
         grid_system::System::new().run_now(&mut world.res);

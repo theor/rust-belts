@@ -14,42 +14,75 @@ impl System {
 
 impl<'a> specs::prelude::System<'a> for System {
     type SystemData = (
+        FetchMut<'a, Grid>,
+        Entities<'a>,
         ReadStorage<'a, Belt>,
         WriteStorage<'a, GridItem>,
-        WriteStorage<'a, Position>,
+        ReadStorage<'a, Position>,
     );
 
-    fn run(&mut self, (belts, mut grid, mut pos): Self::SystemData) {
+    fn run(&mut self, (mut tree, entities, belts, grid, pos): Self::SystemData) {
         use rayon::prelude::*;
-        (&belts).par_join().for_each(|belt| {
-            for item_id in belt.items.iter() {
-                unsafe {
-                    // if let None = belts.get(*item_id) {
-                    // println!("move {:?} on {:?}", item_id, belt);
-                    let ppos = pos.get(*item_id).unwrap() as *const Position;
-                    let ppos = ppos as *mut Position;
+        use crossbeam::sync::MsQueue;
+        let queue = MsQueue::new();
 
-                    let pgrid = grid.get(*item_id).unwrap() as *const GridItem;
-                    let pgrid = pgrid as *mut GridItem;
-                    (*pgrid).move_delta(10, 0);
-                    let (px, py) = (*pgrid).compute_position();
-                    (*ppos).x = px;
-                    (*ppos).y = py;
-                    // }
+        (&*entities, &belts, &grid).par_join().for_each(|(belt_entity, _belt, belt_grid)| {
+
+            let r = GridRegion(
+                belt_grid.ix,
+                belt_grid.iy,
+                belt_grid.ix + 1,
+                belt_grid.iy + 1,
+            );
+
+            let q = tree.0.range_query(&r);
+            for qi in q {
+                if qi.e != belt_entity {
+                    // println!("push {:?} in {:?}", qi.e, belt_entity);
+                    let item_id = qi.e;
+                        unsafe {
+                        // if let None = belts.get(*item_id) {
+                        // println!("move {:?} on {:?}", item_id, belt);
+                        let ppos = pos.get(item_id).unwrap() as *const Position;
+                        let ppos = ppos as *mut Position;
+
+                        let pgrid = grid.get(item_id).unwrap() as *const GridItem;
+                        let pgrid = pgrid as *mut GridItem;
+                        let (px, py) = ((*pgrid).ix, (*pgrid).iy);
+                        if (*pgrid).move_delta(10, 0) {
+                            queue.push((item_id, px, py, (*pgrid).ix, (*pgrid).iy));
+                            // tx.0.remove(&RegionItem::new((*pgrid).ix, (*pgrid).iy, item_id));
+                        }
+                        let (px, py) = (*pgrid).compute_position();
+                        (*ppos).x = px;
+                        (*ppos).y = py;
+                        // }
+                    }
                 }
-
-                // match vel.get(*item_id) {
-                //     Some (vel) => {
-                //         let pvel = vel as *const GridVelocity;
-                //         unsafe {
-                //             let mpvel = pvel as *mut GridVelocity;
-                //             (*mpvel).dx = 10;
-                //         }
-                //     },
-                //     None => (),
-                // }
             }
         });
+        while let Some((item_id, px, py, nx, ny)) = queue.try_pop() {
+            tree.0.remove(&RegionItem::new(px, py, item_id));
+            tree.0.insert(RegionItem::new(nx, ny, item_id));
+            // expr
+        }
+        // for item_id in belt.items.iter() {
+        //     unsafe {
+        //         // if let None = belts.get(*item_id) {
+        //         // println!("move {:?} on {:?}", item_id, belt);
+        //         let ppos = pos.get(*item_id).unwrap() as *const Position;
+        //         let ppos = ppos as *mut Position;
+
+        //         let pgrid = grid.get(*item_id).unwrap() as *const GridItem;
+        //         let pgrid = pgrid as *mut GridItem;
+        //         (*pgrid).move_delta(10, 0);
+        //         let (px, py) = (*pgrid).compute_position();
+        //         (*ppos).x = px;
+        //         (*ppos).y = py;
+        //         // }
+        //     }
+        // }
+        // });
     }
 }
 // impl<'a> specs::prelude::System<'a> for System {
