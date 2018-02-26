@@ -15,7 +15,8 @@ hibitset = "*"
 crossbeam = "*"
 
 [dependencies.ntree]
-git = "https://github.com/theor/rust-n-tree.git"
+# git = "https://github.com/theor/rust-n-tree.git"
+path = "C:/Users/theor/rust-n-tree" 
 
 [dependencies.ggez]
 git = "https://github.com/ggez/ggez.git"
