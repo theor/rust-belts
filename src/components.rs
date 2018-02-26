@@ -102,21 +102,25 @@ impl GridItem {
         }
     }
 
-    pub fn move_delta(&mut self, x: i16, y: i16) {
+    pub fn move_delta(&mut self, x: i16, y: i16) -> bool {
+        let mut res = false;
         if x >= 0 {
             let new_dx = self.dx as u32 + x as u32;
             self.dx = (new_dx % 256) as u8;
             self.ix += new_dx / 256;
+            res |= true;
         } else {
-
+            unimplemented!();
         }
         if y >= 0 {
             let new_dy = self.dy as u32 + y as u32;
             self.dy = (new_dy % 256) as u8;
             self.iy += new_dy / 256;
+            res |= true;
         } else {
-
+            unimplemented!();
         }
+        res
     }
 
     pub fn compute_position(&self) -> (f32, f32) {
