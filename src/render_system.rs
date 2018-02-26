@@ -35,7 +35,7 @@ impl<'a> BaseSystem<'a> for System<'a> {
 
                     let mut batch: &mut SpriteBatch =  &mut batches[sprite.sheet].as_mut().unwrap();
                     let source_rectangle = Rect::new(
-                        img.offset.0 as f32,
+                        (img.offset.0 + sprite.rect.0) as f32,
                         img.offset.1 as f32,
                         img.size.0 as f32,
                         img.size.1 as f32,
