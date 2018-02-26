@@ -26,7 +26,7 @@ impl<'a> specs::prelude::System<'a> for System {
         use crossbeam::sync::MsQueue;
         let queue = MsQueue::new();
 
-        (&*entities, &belts, &grid).par_join().for_each(|(belt_entity, _belt, belt_grid)| {
+        (&*entities, &belts, &grid).par_join().for_each(|(belt_entity, belt, belt_grid)| {
 
             let r = GridRegion(
                 belt_grid.ix,
@@ -49,7 +49,14 @@ impl<'a> specs::prelude::System<'a> for System {
                         let pgrid = grid.get(item_id).unwrap() as *const GridItem;
                         let pgrid = pgrid as *mut GridItem;
                         let (px, py) = ((*pgrid).ix, (*pgrid).iy);
-                        if (*pgrid).move_delta(10, 0) {
+
+                        let (mx, my) = match &belt.0 {
+                            &Direction::Right => (10,0),
+                            &Direction::Down => (0,10),
+                            _ => (0,0),
+                        };
+
+                        if (*pgrid).move_delta(mx, my) {
                             queue.push((item_id, px, py, (*pgrid).ix, (*pgrid).iy));
                             // tx.0.remove(&RegionItem::new((*pgrid).ix, (*pgrid).iy, item_id));
                         }

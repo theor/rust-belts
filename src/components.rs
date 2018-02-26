@@ -145,11 +145,16 @@ impl GridVelocity {
 
 #[derive(Component, Debug)]
 #[storage(DenseVecStorage)]
-pub struct Belt;
+pub struct Belt(pub Direction);
+
+#[derive(PartialEq, Debug, Clone)]
+pub enum Direction {
+    Up,Down,Left,Right,
+}
 
 impl Belt {
-    pub fn new() -> Self {
-        Belt {}
+    pub fn new(d:Direction) -> Self {
+        Belt(d)
     }
 }
 

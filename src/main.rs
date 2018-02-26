@@ -61,9 +61,16 @@ impl MainState {
         }
         world.add_resource(mgr);
 
-        factory::belt(&mut world, 0, 0);
-        factory::belt(&mut world, 1, 0);
+        use components::Direction::*;
+
+        for &(x,y, ref d) in [(0,0,Right), (1,0, Down), (1,1, Down), (1,2, Down),
+                       (1,3, Right), (2,3, Right), (3,3, Down), (3,4, Down)].into_iter() {
+            factory::belt(&mut world, x, y, d.clone());
+
+        }
+
         factory::item_subpos(&mut world, 0, 0, 0, 16);
+        factory::item_subpos(&mut world, 0, 1, 0, 96);
         // for i in 0..1000 {
         //     for j in 0..100 {
         //         factory::belt(&mut world, i, j);

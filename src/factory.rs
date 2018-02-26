@@ -14,7 +14,7 @@ pub fn init(world: &mut World) {
     world.add_resource(Grid(GridTree::new(GridRegion(0,0,1024,1024), 9)));
 }
 
-pub fn belt(world: &mut World, x: u32, y: u32) -> Entity {
+pub fn belt(world: &mut World, x: u32, y: u32, d: Direction) -> Entity {
     let grid = GridItem::new(x, y);
     let (px, py) = grid.compute_position();
     world
@@ -22,7 +22,7 @@ pub fn belt(world: &mut World, x: u32, y: u32) -> Entity {
         .with(Position::at(px, py))
         .with(grid)
         .with(Renderer::sprite(0, (40u8, 40u8), (1.0,1.0)))
-        .with(Belt::new())
+        .with(Belt::new(d))
         .build()
 }
 
