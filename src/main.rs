@@ -71,10 +71,13 @@ impl MainState {
 
         // factory::item_subpos(&mut world, 0, 0, 0, 16);
         // factory::item_subpos(&mut world, 0, 1, 0, 96);
-        for i in 0..1000 {
+        for i in 0..1100 {
             for j in 0..100 {
                 factory::belt(&mut world, i, j, Right);
             }
+        }
+
+        for i in 0..1000 {
             for j in 0..250 {
                 for d in 0..4 {
                     factory::item_subpos(&mut world, i, j, d * (255 / 4), 16);
