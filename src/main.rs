@@ -63,28 +63,28 @@ impl MainState {
 
         use components::Direction::*;
 
-        for &(x,y, ref d) in [(0,0,Right), (1,0, Down), (1,1, Down), (1,2, Down),
-                       (1,3, Right), (2,3, Right), (3,3, Up), (3,2, Up), (3,1, Up)].into_iter() {
-            factory::belt(&mut world, x, y, d.clone());
+        // for &(x,y, ref d) in [(0,0,Right), (1,0, Down), (1,1, Down), (1,2, Down),
+        //                (1,3, Right), (2,3, Right), (3,3, Up), (3,2, Up), (3,1, Up)].into_iter() {
+        //     factory::belt(&mut world, x, y, d.clone());
 
+        // }
+
+        // factory::item_subpos(&mut world, 0, 0, 0, 16);
+        // factory::item_subpos(&mut world, 0, 1, 0, 96);
+        for i in 0..1100 {
+            for j in 0..100 {
+                factory::belt(&mut world, i, j, Right);
+            }
         }
 
-        factory::item_subpos(&mut world, 0, 0, 0, 16);
-        factory::item_subpos(&mut world, 0, 1, 0, 96);
-        // for i in 0..1100 {
-        //     for j in 0..100 {
-        //         factory::belt(&mut world, i, j, Right);
-        //     }
-        // }
-
-        // for i in 0..1000 {
-        //     for j in 0..250 {
-        //         for d in 0..4 {
-        //             factory::item_subpos(&mut world, i, j, d * (255 / 4), 16);
-        //             factory::item_subpos(&mut world, i, j, d * (255 / 4), 112);
-        //         }
-        //     }
-        // }
+        for i in 0..1000 {
+            for j in 0..250 {
+                for d in 0..4 {
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4), 16);
+                    factory::item_subpos(&mut world, i, j, d * (255 / 4), 112);
+                }
+            }
+        }
 
         let mut dispatcher = DispatcherBuilder::new();
         dispatcher.add(move_system::System::new(), "move", &[]);
@@ -420,19 +420,19 @@ mod tests {
         let mut world = World::new();
         factory::init(&mut world);
 
-       for j in 0..1000 {
-           for i in 0..250 {
+       for i in 0..1010 {
+            for j in 0..125 {
+                factory::belt(&mut world, i, j, Direction::Right);
+            }
+        }
+       for i in 0..1000 {
+           for j in 0..250 {
                 for d in 0..4 {
                     factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
                     factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
                 }
             }
        }
-       for j in 0..1000 {
-            for i in 0..125 {
-                factory::belt(&mut world, i, j, Direction::Right);
-            }
-        }
         world
     }
 
