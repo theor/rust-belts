@@ -19,7 +19,7 @@ pub fn belt(world: &mut World, x: u32, y: u32, d: Direction) -> Entity {
     let (px, py) = grid.compute_position();
     use components::Direction::*;
     use components::Flip::*;
-    let (src, s) = match d.clone() {
+    let (src, _s) = match d.clone() {
         Right => ((0u8, 0u8), (1.0, 1.0)),
         Down => ((0u8, 40u8), (1.0, -1.0)),
         Up => ((0u8, 40u8), (1.0, 1.0)),
@@ -29,7 +29,7 @@ pub fn belt(world: &mut World, x: u32, y: u32, d: Direction) -> Entity {
         .create_entity()
         .with(Position::at(px, py))
         .with(grid)
-        .with(Renderer::sprite(0, src, s, None))
+        .with(Renderer::sprite(0, src, (1.0,1.0), None))
         .with(Belt::new(d.clone()))
         .build()
 }

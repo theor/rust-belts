@@ -35,8 +35,8 @@ impl<'a> BaseSystem<'a> for System<'a> {
 
                     let mut batch: &mut SpriteBatch =  &mut batches[sprite.sheet].as_mut().unwrap();
                     let source_rectangle = Rect::new(
-                        img.offset.0 + (sprite.rect.0 as f32 / img.dim.0 as f32),
-                        img.offset.1 + (sprite.rect.1 as f32 / img.dim.1 as f32),
+                        /*img.offset.0 + */(sprite.rect.0 as f32 / img.dim.0 as f32),
+                        /*img.offset.1 + */(sprite.rect.1 as f32 / img.dim.1 as f32),
                         img.size.0 as f32,
                         img.size.1 as f32,
                     );
@@ -48,13 +48,14 @@ impl<'a> BaseSystem<'a> for System<'a> {
                     //     None => (position.x, position.y),
                     //     Horizontal => (position.x, position.y),
                     // }
-                    let dest = Point2::new(position.x, position.y);
+                    let dest = Point2::new(position.x + sprite.rect.0 as f32 / 2.0, position.y + sprite.rect.1 as f32 / 2.0);
                     // let dest = Point2::new(0.0,0.0);
                     let draw_params = DrawParam {
                         src: source_rectangle,
                         dest: dest,
                         scale: Point2::new(sprite.scale.0, sprite.scale.1),
-                        offset: Point2::new(0.5, 0.5),
+                        offset: Point2::new(0.0, 0.0),
+                        // offset: Point2::new(0.5, 0.5),
                         ..Default::default()
                     };
                     batch.add(draw_params);
