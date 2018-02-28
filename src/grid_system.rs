@@ -11,13 +11,14 @@ impl System {
 impl<'a> specs::prelude::System<'a> for System {
     type SystemData = (
         Fetch<'a, DeltaTime>,
+        ReadStorage<'a, Belt>,
         FetchMut<'a, Grid>,
         Entities<'a>,
         ReadStorage<'a, GridItem>,
     );
 
-    fn run(&mut self, (_delta, mut tree, entities, grid_item): Self::SystemData) {
-        // use rayon::prelude::*;
+    fn run(&mut self, (_delta, belts, mut tree, entities, grid_item): Self::SystemData) {
+        use rayon::prelude::ParallelIterator;
 
         // belts -> items
         // for (_belt, belt_grid) in (&belt, &grid).join() {
@@ -40,5 +41,24 @@ impl<'a> specs::prelude::System<'a> for System {
                 tree.0
                     .insert(RegionItem::new(belt_grid.ix, belt_grid.iy, belt_entity));
             });
+        (&*entities, &grid_item, &belts)
+            .par_join()
+            .for_each(|(belt_entity, belt_grid, belt)| {
+            use std::sync::atomic::Ordering;
+            let r = GridRegion(
+                belt_grid.ix,
+                belt_grid.iy,
+                belt_grid.ix + 1,
+                belt_grid.iy + 1,
+            );
+            let mut i = 0;
+            let q = tree.0.range_query(&r);
+            for qi in q {
+                if qi.e != belt_entity {
+                    belt.items[i].swap(qi.e.id() as usize, Ordering::Relaxed);
+                }
+                i += 1;
+            }
+        });
     }
 }

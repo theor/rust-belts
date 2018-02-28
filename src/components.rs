@@ -7,6 +7,7 @@ pub struct Camera(pub f32, pub f32);
 use ntree::{NTree};
 pub type GridTree = NTree<GridRegion, RegionItem>;
 pub struct Grid(pub GridTree);
+use std::sync::atomic::AtomicUsize;
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
@@ -169,7 +170,10 @@ impl GridVelocity {
 
 #[derive(Component, Debug)]
 #[storage(DenseVecStorage)]
-pub struct Belt(pub Direction);
+pub struct Belt{
+    pub direction: Direction,
+    pub items: Vec<AtomicUsize>,
+}
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum Direction {
@@ -177,8 +181,9 @@ pub enum Direction {
 }
 
 impl Belt {
-    pub fn new(d:Direction) -> Self {
-        Belt(d)
+    pub fn new(direction:Direction) -> Self {
+        use std::iter;
+        Belt{ direction, items: iter::repeat(0).take(12).map (|_| AtomicUsize::new(0)).collect(), }
     }
 }
 
