@@ -9,6 +9,7 @@ pub type GridTree = NTree<GridRegion, RegionItem>;
 pub struct Grid(pub GridTree);
 use std::sync::atomic::AtomicUsize;
 
+
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
 pub struct Position {
@@ -17,6 +18,7 @@ pub struct Position {
 }
 
 impl Position {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Position { x: 0.0, y: 0.0 }
     }
@@ -176,6 +178,7 @@ pub struct Belt{
 }
 
 #[derive(PartialEq, Debug, Clone)]
+#[allow(dead_code)]
 pub enum Direction {
     Up,Down,Left,Right,
 }
@@ -193,6 +196,7 @@ pub struct Item {}
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
+#[allow(dead_code)]
 pub enum Renderer {
     SpriteSheet(Sprite),
     Shape(Shape),
@@ -207,6 +211,7 @@ impl Renderer {
             flip,
         })
     }
+    #[allow(dead_code)]
     pub fn shape(rect: (u8, u8)) -> Self {
         Renderer::Shape(Shape { rect: rect })
     }
@@ -220,7 +225,9 @@ pub struct Shape {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
 pub enum Flip { None, Horizontal, Vertical, Both, }
+
 #[derive(Debug)]
 pub struct Sprite {
     pub sheet: usize,

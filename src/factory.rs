@@ -47,7 +47,7 @@ pub fn item_subpos(world: &mut World, x: u32, y: u32, dx: u8, dy: u8) -> Entity 
         .with(Item{})
         .build()
 }
-
+#[allow(dead_code)]
 pub fn item(world: &mut World, x: u32, y: u32) -> Entity {
     use components;
     let grid = GridItem::new(x, y);

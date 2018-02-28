@@ -420,14 +420,14 @@ mod tests {
         let mut world = World::new();
         factory::init(&mut world);
 
-       for i in 0..1010 {
-            for j in 0..125 {
+       for i in 0..100{
+            for j in 0..10 {
                 factory::belt(&mut world, i, j, Direction::Right);
             }
         }
-       for i in 0..1000 {
-           for j in 0..250 {
-                for d in 0..4 {
+       for i in 0..10 {
+           for j in 0..100 {
+                for d in 0..1 {
                     factory::item_subpos(&mut world, i, j, d * (255 / 4), 0);
                     factory::item_subpos(&mut world, i, j, d * (255 / 4),127);
                 }

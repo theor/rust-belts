@@ -21,13 +21,11 @@ impl<'a> specs::prelude::System<'a> for System {
         ReadStorage<'a, Position>,
     );
 
-    fn run(&mut self, (mut tree, entities, belts, grid, pos): Self::SystemData) {
+    fn run(&mut self, (tree, entities, belts, grid, pos): Self::SystemData) {
         use rayon::prelude::*;
-        // use crossbeam::sync::MsQueue;
-        // let queue = MsQueue::new();
         use std::sync::atomic::Ordering;
 
-        (&*entities, &belts, &grid).par_join().for_each(|(belt_entity, belt, belt_grid)| {
+        (&belts, &grid).par_join().for_each(|(belt, _belt_grid)| {
 
             for qie in belt.items.iter() {
                     // println!("push {:?} in {:?}", qie, belt_entity);
@@ -44,7 +42,6 @@ impl<'a> specs::prelude::System<'a> for System {
 
                     let pgrid = grid.get(item_entity).unwrap() as *const GridItem;
                     let pgrid = pgrid as *mut GridItem;
-                    let (px, py) = ((*pgrid).ix, (*pgrid).iy);
 
                     let (mx, my) = match &belt.direction {
                         &Direction::Right => (10,0),
@@ -61,7 +58,6 @@ impl<'a> specs::prelude::System<'a> for System {
                             (*pgrid).ix + 1,
                             (*pgrid).iy + 1,
                         );
-                        let mut i = 0;
                         let q = tree.0.range_query(&r);
                         for qi in q {
                             match belts.get(qi.e) {
@@ -77,14 +73,7 @@ impl<'a> specs::prelude::System<'a> for System {
                                     break;
                                 },
                             }
-                            // if qi.e == belt_entity {
-                            //     belt.items[i].swap(qi.e.id() as usize, Ordering::Relaxed);
-                            // }
-                            // i += 1;
                         }
-                        // belt.items
-                        // queue.push((item_entity, px, py, (*pgrid).ix, (*pgrid).iy));
-                        // tx.0.remove(&RegionItem::new((*pgrid).ix, (*pgrid).iy, item_entity));
                     } else {
                         /*item_id = */qie.swap(item_id, Ordering::Release);
                     }
