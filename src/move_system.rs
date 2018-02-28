@@ -66,7 +66,16 @@ impl<'a> specs::prelude::System<'a> for System {
                         for qi in q {
                             match belts.get(qi.e) {
                                 None => (),
-                                Some(other) => { other.items[0].swap(item_id, Ordering::Relaxed); },
+                                Some(other) => {
+                                    'outer: loop {
+                                        for i in 0..12 {
+                                            if 0 == other.items[i].compare_and_swap(0, item_id, Ordering::Relaxed) {
+                                                break 'outer;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                },
                             }
                             // if qi.e == belt_entity {
                             //     belt.items[i].swap(qi.e.id() as usize, Ordering::Relaxed);
