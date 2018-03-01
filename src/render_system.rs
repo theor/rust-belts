@@ -48,14 +48,20 @@ impl<'a> BaseSystem<'a> for System<'a> {
                     //     None => (position.x, position.y),
                     //     Horizontal => (position.x, position.y),
                     // }
-                    let dest = Point2::new(position.x + sprite.rect.0 as f32 / 2.0, position.y + sprite.rect.1 as f32 / 2.0);
+                    let dest = Point2::new(position.x + sprite.scale.0 * 32.0 / 2.0, position.y + sprite.scale.1 * 32.0 / 2.0);
+                    let scale_flipped = match sprite.flip {
+                        Flip::None => (1.0,1.0),
+                        Flip::Horizontal => (-1.0,1.0),
+                        Flip::Vertical => (1.0,-1.0),
+                        Flip::Both => (-1.0,-1.0),
+                    };
                     // let dest = Point2::new(0.0,0.0);
                     let draw_params = DrawParam {
                         src: source_rectangle,
                         dest: dest,
-                        scale: Point2::new(sprite.scale.0, sprite.scale.1),
-                        offset: Point2::new(0.0, 0.0),
-                        // offset: Point2::new(0.5, 0.5),
+                        scale: Point2::new(sprite.scale.0 * scale_flipped.0, sprite.scale.1 * scale_flipped.1),
+                        // offset: Point2::new(0.0, 0.0),
+                        offset: Point2::new(0.5, 0.5),
                         ..Default::default()
                     };
                     batch.add(draw_params);

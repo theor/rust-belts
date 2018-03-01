@@ -18,18 +18,18 @@ pub fn belt(world: &mut World, x: u32, y: u32, d: Direction) -> Entity {
     let grid = GridItem::new(x, y);
     let (px, py) = grid.compute_position();
     use components::Direction::*;
-    use components::Flip::*;
-    let (src, _s) = match d.clone() {
-        Right => ((0u8, 0u8), (1.0, 1.0)),
-        Down => ((0u8, 40u8), (1.0, -1.0)),
-        Up => ((0u8, 40u8), (1.0, 1.0)),
-        Left => ((0u8, 0u8), (-1.0, 1.0)),
+    use components::Flip;
+    let (src, s, f) = match d.clone() {
+        Right => ((0u8, 0u8), (1.0, 1.0), Flip::None),
+        Down => ((0u8, 40u8), (1.0, 1.0), Flip::Vertical),
+        Up => ((0u8, 40u8), (1.0, 1.0), Flip::None),
+        Left => ((0u8, 0u8), (1.0, 1.0), Flip::Horizontal),
     };
     world
         .create_entity()
         .with(Position::at(px, py))
         .with(grid)
-        .with(Renderer::sprite(0, src, (1.0,1.0), None))
+        .with(Renderer::sprite(0, src, s, f))
         .with(Belt::new(d.clone()))
         .build()
 }
@@ -44,7 +44,7 @@ pub fn item_subpos(world: &mut World, x: u32, y: u32, dx: u8, dy: u8) -> Entity 
         // .with(Renderer::shape((16u8,16u8)))
         .with(Renderer::sprite(1, (0u8,0u8), (0.5,0.5), components::Flip::None))
         .with(GridVelocity::new())
-        .with(Item{})
+        // .with(Item{})
         .build()
 }
 #[allow(dead_code)]

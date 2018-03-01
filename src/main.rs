@@ -49,7 +49,7 @@ struct MainState {
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<MainState> {
         let font = graphics::Font::new(ctx, "/FiraSans-Regular.ttf", 48)?;
-        let text = graphics::Text::new(ctx, "Hello world!", &font)?;
+        let text = graphics::Text::new(ctx, "", &font)?;
 
         let mut world = World::new();
         factory::init(&mut world);
@@ -63,13 +63,20 @@ impl MainState {
 
         use components::Direction::*;
 
+        // for &(x,y, ref d) in [(0,0,Right), (1,0, Down), (2,0, Up), (3,0, Left),
+        //                       (0,1,Right), (1,1, Down), (2,1, Up), (3,1, Left)].into_iter() {
         for &(x,y, ref d) in [(0,0,Right), (1,0, Down), (1,1, Down), (1,2, Down),
                        (1,3, Right), (2,3, Right), (3,3, Up), (3,2, Up), (3,1, Up)].into_iter() {
             factory::belt(&mut world, x, y, d.clone());
 
         }
 
+        // factory::item_subpos(&mut world, 0, 0, 0, 0);
         factory::item_subpos(&mut world, 0, 0, 0, 16);
+        factory::item_subpos(&mut world, 0, 0, 0, 112);
+        // factory::item_subpos(&mut world, 0, 0, 0, 0);
+        factory::item_subpos(&mut world, 0, 0, 32, 16);
+        factory::item_subpos(&mut world, 0, 0, 32, 112);
         factory::item_subpos(&mut world, 0, 1, 0, 96);
         // for i in 0..1100 {
         //     for j in 0..100 {
@@ -88,7 +95,6 @@ impl MainState {
 
         let mut dispatcher = DispatcherBuilder::new();
         dispatcher.add(move_system::System::new(), "move", &[]);
-        // dispatcher.add(update_pos_system::System, "update_pos_system", &["move"]);
         let dispatcher = dispatcher.build();
 
         println!("Grid System");
